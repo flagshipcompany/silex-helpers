@@ -1,0 +1,20 @@
+{
+    "name": "flagshipcompany/silex-helpers",
+    "version": "0.0.1",
+    "type": "library",
+    "requires": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "pimple/pimple": "~3.0"
+    },
+    "authors": [{
+        "name": "Patrick Leblanc",
+        "email": "patrick@flagshipcompany.com"
+    }],
+    "autoload": {
+        "psr-4": {
+            "Flagship\\Components\\Helpers\\": "src/"
+        }
+    }
+}
