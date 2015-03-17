@@ -6,7 +6,9 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "pimple/pimple": "~3.0"
+        "pimple/pimple": "~3.0",
+        "twig/twig": "~1.18"
+
     },
     "authors": [{
         "name": "Patrick Leblanc",
