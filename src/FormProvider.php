@@ -9,7 +9,7 @@ class FormProvider implements ServiceProviderInterface
 {
     public function register(Container $app)
     {
-        $app['flagship.helpers.forms.getErrorMessages'] = $app->protect(function (\Symfony\Component\Form\Form $form) {
+        $app['flagship.helpers.forms.getErrorMessages'] = $app->protect(function (\Symfony\Component\Form\Form $form) use ($app) {
             $errors = array();
 
             foreach ($form->getErrors() as $key => $error) {
@@ -22,7 +22,7 @@ class FormProvider implements ServiceProviderInterface
 
             foreach ($form->all() as $child) {
                 if (!$child->isValid()) {
-                    $errors[$child->getName()] = $this->getErrorMessages($child);
+                    $errors[$child->getName()] = $app['flagship.helpers.forms.getErrorMessages']($child);
                 }
             }
 
