@@ -11,12 +11,14 @@ class FormProvider implements ServiceProviderInterface
     {
         $app['flagship.helpers.forms.getErrorMessages'] = $app->protect(function (\Symfony\Component\Form\Form $form) use ($app) {
             $errors = array();
+            $data = $form->getData();
 
             foreach ($form->getErrors() as $key => $error) {
                 if ($form->isRoot()) {
                     $errors['#'][] = $error->getMessage();
                 } else {
-                    $errors[] = $error->getMessage();
+                    $message = empty($data) ? $error->getMessage() : $data.' '.$error->getMessage();
+                    $errors[] = $message;
                 }
             }
 
