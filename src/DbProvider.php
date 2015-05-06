@@ -52,30 +52,22 @@ class DbProvider implements ServiceProviderInterface
             if (count($rows) == 0) {
                 return [];
             }
-
-            $createItem = function (array $itemKeys, array $row) {
-                $item = [];
-                foreach ($itemKeys as $rowKey => $dbKey) {
-                    $item[$dbKey] = $row[$rowKey];
-                }
-
-                return $item;
-            };
             // Arrange keys
             $allKeys = array_keys($rows[0]);
             // Get a map with rowsKeys => dbKey
             $keyMap = [];
-            array_walk($allKeys, function ($item) use (&$keyMap) {
-                $pieces = explode('_', $item);
-                $element = array_splice($pieces, 0, 1);
-                $keyMap[$element[0]][$item] = implode('_', $pieces);
-            });
+
+            foreach ($allKeys as $item) {
+                $element = substr($item, 0, strpos($item, '_'));
+                $keyMap[$element][$item] = substr($item, strpos($item, '_')+1);
+            }
 
             if (empty($entityPrefix)) {
                 // Assume the first item is the entity
                 $entityKeys = array_splice($keyMap, 0, 1);
                 $entityKeys = reset($entityKeys);
             }
+
             if (!empty($entityPrefix)) {
                 $entityKeys = $keyMap[$entityPrefix];
                 unset($keyMap[$entityPrefix]);
@@ -85,21 +77,34 @@ class DbProvider implements ServiceProviderInterface
             // Assume the first item is the unique identifier
             $unique = reset($columns);
             $entities = [];
+            $i = 0;
 
             foreach ($rows as $r) {
-                $entities[$r[$unique]] = $createItem($entityKeys, $r);
-            }
+                $i++;
+                $uniquer = $r[$unique];
+                if (!isset($entities[$uniquer])) {
+                    $entities[$uniquer] = $this->createItem($entityKeys, $r);
+                }
 
-            foreach ($keyMap as $subName => $sub) {
-                $subColumns = array_keys($sub);
-                // Assume the first item is the unique identifier
-                $subUnique = reset($subColumns);
-                foreach ($rows as $r) {
-                    $entities[$r[$unique]][$subName][$r[$subUnique]] = $createItem($sub, $r);
+                foreach ($keyMap as $subName => $sub) {
+                    $subColumns = array_keys($sub);
+                    // Assume the first item is the unique identifier
+                    $subUnique = $r[reset($subColumns)];
+                    $entities[$uniquer][$subName][$subUnique] = $this->createItem($sub, $r);
                 }
             }
 
             return $entities;
         });
+    }
+
+    protected function createItem(array $itemKeys, array $row)
+    {
+        $item = [];
+        foreach ($itemKeys as $rowKey => $dbKey) {
+            $item[$dbKey] = $row[$rowKey];
+        }
+
+        return $item;
     }
 }
