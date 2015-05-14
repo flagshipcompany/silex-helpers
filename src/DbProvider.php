@@ -94,6 +94,16 @@ class DbProvider implements ServiceProviderInterface
                 }
             }
 
+            //clear up the values from the keys
+            $entities = array_values($entities);
+            foreach ($entities as $key => &$value) {
+                foreach ($value as $subkey => &$subvalue) {
+                    if (is_array($subvalue)) {
+                        $subvalue = array_values($subvalue);
+                    }
+                }
+            }
+
             return $entities;
         });
     }
