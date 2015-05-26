@@ -99,7 +99,9 @@ class DbProvider implements ServiceProviderInterface
             foreach ($entities as $key => &$value) {
                 foreach ($value as $subkey => &$subvalue) {
                     if (is_array($subvalue)) {
-                        $subvalue = array_values($subvalue);
+                        // if the subvalue key is empty(or false) make subvalue empty
+                        // this is an issue when a shipment has no accountables
+                        $subvalue = key($subvalue) == false ? [] : array_values($subvalue);
                     }
                 }
             }
