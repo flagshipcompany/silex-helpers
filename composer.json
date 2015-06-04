@@ -7,8 +7,10 @@
     },
     "require-dev": {
         "pimple/pimple": "~3.0",
-        "twig/twig": "~1.18"
-
+        "twig/twig": "~1.18",
+        "symfony/console": "~2.6",
+        "doctrine/dbal": "~2.5",
+        "flagshipcompany/entities": "@dev"
     },
     "authors": [{
         "name": "Patrick Leblanc",
@@ -18,5 +20,11 @@
         "psr-4": {
             "Flagship\\Components\\Helpers\\": "src/"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:flagshipcompany/entities.git"
+        }
+    ]    
 }

@@ -1,0 +1,27 @@
+<?php
+
+class {{class}} {
+
+	/**
+	 * Run the migrations.
+	 *
+	 * @return string
+	 */
+	public function up()
+	{
+		//
+		return "";
+	}
+
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return string
+	 */
+	public function down()
+	{
+		//
+		return "";
+	}
+
+}
