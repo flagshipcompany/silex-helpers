@@ -10,7 +10,10 @@ class {{class}} {
 	public function up()
 	{
 		//
-		return "";
+		$SQL = <<<SQL
+
+SQL;
+		return $SQL;
 	}
 
 	/**
@@ -21,7 +24,10 @@ class {{class}} {
 	public function down()
 	{
 		//
-		return "";
+		$SQL = <<<SQL
+
+SQL;
+		return $SQL;
 	}
 
 }

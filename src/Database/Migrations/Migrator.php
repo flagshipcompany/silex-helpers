@@ -180,17 +180,15 @@ class Migrator
         // instance of the migration.
         $instance = $this->resolve($migration);
         
-        try {
-            $this->repository->migrate($instance->down());
-            // Once we have successfully run the migration "down" we will remove it from
-            // the migration repository so it will be considered to have not been run
-            // by the application then will be able to fire by any later operation.
-            $this->repository->delete($migration);
 
-            $this->note("<info>Rolled back:</info> $migration");
-        } catch (\Exception $e) {
+        $this->repository->migrate($instance->down());
+        // Once we have successfully run the migration "down" we will remove it from
+        // the migration repository so it will be considered to have not been run
+        // by the application then will be able to fire by any later operation.
+        $this->repository->delete($migration);
 
-        }
+        $this->note("<info>Rolled back:</info> $migration");
+
     }
 
     /**
