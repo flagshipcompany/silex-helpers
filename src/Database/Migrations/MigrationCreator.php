@@ -51,7 +51,7 @@ class MigrationCreator
      */
     public function getStubPath()
     {
-        return __DIR__.'/stubs/migration.stub';
+        return __DIR__.'/Stubs/migration.stub';
     }
 
     /**
