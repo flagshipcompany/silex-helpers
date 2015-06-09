@@ -41,8 +41,10 @@ class MigrateMakeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $migration = $input->getArgument('migration');
+
+        $this->defaults = MigrationConf::$default;
         $options = [
-            'path' => $input->getOption('path') ?: $this->app['migrations.path'],
+            'path' => $this->getPath($input->getOption('env'), $input->getOption('path')),
         ];
 
         $creator = new MigrationCreator(
@@ -51,5 +53,21 @@ class MigrateMakeCommand extends Command
         );
 
         $creator->create();
+    }
+
+    protected function getPath($environment, $path) {
+        if ($path) {
+            return $path;
+        }
+
+        if ($environment && $environment != 'dev') {
+            return DriverManager::getConnection($this->app[$environment]['migrations.path'], new \Doctrine\DBAL\Configuration());
+        }
+
+        if (isset($this->app['migrations.path'])) {
+            return $this->app['migrations.path'];
+        }
+
+        return $this->defaults['migrations.path'];
     }
 }
