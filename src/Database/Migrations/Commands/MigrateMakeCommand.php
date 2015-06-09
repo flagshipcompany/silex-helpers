@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Flagship\Components\Helpers\Database\Migrations\MigrationCreator;
+use Flagship\Components\Helpers\Database\Migrations\Configs\Configuration as MigrationConf;
 
 class MigrateMakeCommand extends Command
 {
@@ -35,6 +36,12 @@ class MigrateMakeCommand extends Command
                InputOption::VALUE_OPTIONAL,
                'If not set, the migrations files path will use application default.'
             )
+            ->addOption(
+               'env',
+               null,
+               InputOption::VALUE_OPTIONAL,
+               'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
+            )
         ;
     }
 
@@ -61,7 +68,7 @@ class MigrateMakeCommand extends Command
         }
 
         if ($environment && $environment != 'dev') {
-            return DriverManager::getConnection($this->app[$environment]['migrations.path'], new \Doctrine\DBAL\Configuration());
+            return $this->app[$environment]['migrations.path'];
         }
 
         if (isset($this->app['migrations.path'])) {

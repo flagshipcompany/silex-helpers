@@ -37,7 +37,7 @@ class MigrateCommand extends Command
                'path',
                null,
                InputOption::VALUE_OPTIONAL,
-               'If not set, the migrations files path will use application default. If application default is not accessible, the default path will be "./database/migrations"'
+               'If not set, the migrations files path will use application default. If application default is not accessible, the default path will be "./var/migrations"'
             )
             ->addOption(
                'db',
@@ -86,7 +86,7 @@ class MigrateCommand extends Command
         }
 
         if ($environment && $environment != 'dev') {
-            return DriverManager::getConnection($this->app[$environment]['migrations.path'], new \Doctrine\DBAL\Configuration());
+            return $this->app[$environment]['migrations.path'];
         }
 
         if (isset($this->app['migrations.path'])) {
