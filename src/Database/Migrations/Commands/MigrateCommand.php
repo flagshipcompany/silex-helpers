@@ -107,7 +107,7 @@ class MigrateCommand extends Command
         }
 
         if ($target == 'dbs' && count($this->app['dbs']) > 0) {
-            return array_values($array)[0]; // return first db connection
+            return array_values($this->app['dbs'])[0]; // return first db connection
         }
 
         if (isset($this->app[$this->environment])) {
