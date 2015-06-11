@@ -12,12 +12,14 @@ use Flagship\Components\Helpers\Database\Migrations\Configs\Configuration as Mig
 class MigrateMakeCommand extends Command
 {
     protected $app;
+    protected $environment;
 
-    public function __construct($app)
+    public function __construct($app, $environment)
     {
         parent::__construct();
 
         $this->app = $app;
+        $this->environment = $environment;
     }
 
     protected function configure()
@@ -51,7 +53,7 @@ class MigrateMakeCommand extends Command
 
         $this->defaults = MigrationConf::$default;
         $options = [
-            'path' => $this->getPath($input->getOption('env'), $input->getOption('path')),
+            'path' => $this->getPath($input->getOption('path')),
         ];
 
         $creator = new MigrationCreator(
@@ -62,12 +64,12 @@ class MigrateMakeCommand extends Command
         $creator->create();
     }
 
-    protected function getPath($environment, $path) {
+    protected function getPath($path) {
         if ($path) {
             return $path;
         }
 
-        if ($environment && $environment != 'dev') {
+        if (isset($this->app[$this->environment])) {
             return $this->app[$environment]['migrations.path'];
         }
 

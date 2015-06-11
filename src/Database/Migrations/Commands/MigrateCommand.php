@@ -16,11 +16,12 @@ class MigrateCommand extends Command
 {
     protected $app;
 
-    public function __construct($app)
+    public function __construct($app, $environment)
     {
         parent::__construct();
 
         $this->app = $app;
+        $this->environment = $environment;
     }
 
     protected function configure()
@@ -58,11 +59,11 @@ class MigrateCommand extends Command
     {
         $this->defaults = MigrationConf::$default;
 
-        $db = $this->getDB($input->getOption('env'), $input->getOption('db'));
+        $db = $this->getDB($input->getOption('db'));
 
         $repository = new MigrationRepository($db);
         $options = [
-            'path' => $this->getPath($input->getOption('env'), $input->getOption('path')),
+            'path' => $this->getPath($input->getOption('path')),
         ];
 
         $migrator = new Migrator(
@@ -80,13 +81,13 @@ class MigrateCommand extends Command
         }
     }
 
-    protected function getPath($environment, $path) {
+    protected function getPath($path) {
         if ($path) {
             return $path;
         }
 
-        if ($environment && $environment != 'dev') {
-            return $this->app[$environment]['migrations.path'];
+        if (isset($this->app[$this->environment])) {
+            return $this->app[$this->environment]['migrations.path'];
         }
 
         if (isset($this->app['migrations.path'])) {
@@ -96,14 +97,20 @@ class MigrateCommand extends Command
         return $this->defaults['migrations.path'];
     }
 
-    protected function getDB($environment, $db)
+    protected function getDB($db)
     {
+        $target = isset($this->app['dbs']) ? 'dbs' : 'db';
+
         if ($db) {
-            $target = isset($this->app['dbs']) ? 'dbs' : 'db';
+            // return a DBAL connection
             return $this->app[$target][$db];
         }
 
-        if ($environment && $environment != 'dev') {
+        if ($target == 'dbs' && count($this->app['dbs']) > 0) {
+            return array_values($array)[0]; // return first db connection
+        }
+
+        if (isset($this->app[$this->environment])) {
             return DriverManager::getConnection($this->app[$environment]['db.options'], new \Doctrine\DBAL\Configuration());
         }
 
@@ -114,3 +121,13 @@ class MigrateCommand extends Command
         return DriverManager::getConnection($this->defaults['db.options'], new \Doctrine\DBAL\Configuration());
     }
 }
+
+
+
+
+
+
+
+
+
+
