@@ -99,7 +99,8 @@ class MigrateCommand extends Command
     protected function getDB($environment, $db)
     {
         if ($db) {
-            return $this->app['db'][$db];
+            $target = isset($this->app['dbs']) ? 'dbs' : 'db';
+            return $this->app[$target][$db];
         }
 
         if ($environment && $environment != 'dev') {
