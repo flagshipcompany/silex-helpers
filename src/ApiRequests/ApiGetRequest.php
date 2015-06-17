@@ -14,9 +14,11 @@ class ApiGetRequest
         $this->apiUrl = $app['api.url'];
     }
 
-    public function request($uri, $data)
+    public function request($uri, $data, $isAdmin = false)
     {
-        $headers = $this->app['auth.apiheaders_service']->generateHeaders();
+        $headers = $isAdmin
+            ? $this->app['auth.apiheaders_service']->generateAdminHeaders()
+            : $this->app['auth.apiheaders_service']->generateHeaders();
         $location = $this->apiUrl.$uri.'?'.$this->createQuery($data);
 
         return $this->doRequest($location, $headers);
