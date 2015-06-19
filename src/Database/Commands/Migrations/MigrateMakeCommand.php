@@ -1,5 +1,5 @@
 <?php
-namespace Flagship\Components\Helpers\Database\Migrations\Commands;
+namespace Flagship\Components\Helpers\Database\Commands\Migrations;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -7,19 +7,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Flagship\Components\Helpers\Database\Migrations\MigrationCreator;
-use Flagship\Components\Helpers\Database\Migrations\Configs\Configuration as MigrationConf;
 
 class MigrateMakeCommand extends Command
 {
     protected $app;
-    protected $environment;
+    protected $path;
 
     public function __construct($app, $environment)
     {
         parent::__construct();
 
         $this->app = $app;
-        $this->environment = $environment;
+        $this->path = $this->getOption('path')?: $this->app['migrations.path'];
     }
 
     protected function configure()
@@ -36,7 +35,7 @@ class MigrateMakeCommand extends Command
                'path',
                null,
                InputOption::VALUE_OPTIONAL,
-               'If not set, the migrations files path will use application default.'
+               'If not set, the migrations files path will use application default. $app[\'migrations.path\']'
             )
             ->addOption(
                'env',
@@ -51,9 +50,8 @@ class MigrateMakeCommand extends Command
     {
         $migration = $input->getArgument('migration');
 
-        $this->defaults = MigrationConf::$default;
         $options = [
-            'path' => $this->getPath($input->getOption('path')),
+            'path' => $this->path,
         ];
 
         $creator = new MigrationCreator(
@@ -62,21 +60,5 @@ class MigrateMakeCommand extends Command
         );
 
         $creator->create();
-    }
-
-    protected function getPath($path) {
-        if ($path) {
-            return $path;
-        }
-
-        if (isset($this->app[$this->environment])) {
-            return $this->app[$environment]['migrations.path'];
-        }
-
-        if (isset($this->app['migrations.path'])) {
-            return $this->app['migrations.path'];
-        }
-
-        return $this->defaults['migrations.path'];
     }
 }
