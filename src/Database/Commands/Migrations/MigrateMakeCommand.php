@@ -13,12 +13,11 @@ class MigrateMakeCommand extends Command
     protected $app;
     protected $path;
 
-    public function __construct($app, $environment)
+    public function __construct($app)
     {
         parent::__construct();
 
         $this->app = $app;
-        $this->path = $this->getOption('path')?: $this->app['migrations.path'];
     }
 
     protected function configure()
@@ -48,6 +47,7 @@ class MigrateMakeCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->path = $input->getOption('path')?: $this->app['migrations.path'];
         $migration = $input->getArgument('migration');
 
         $options = [

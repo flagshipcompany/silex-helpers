@@ -16,13 +16,11 @@ class MigrateCommand extends Command
     protected $db;
     protected $path;
 
-    public function __construct($app, $environment)
+    public function __construct($app)
     {
         parent::__construct();
 
         $this->app = $app;
-        $this->db = $this->getOption('db') ? $this->app['dbs'][$this->getOption('db')] : $this->app['db'];
-        $this->path = $this->getOption('path')?: $this->app['migrations.path'];
     }
 
     protected function configure()
@@ -58,6 +56,9 @@ class MigrateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->db = $input->getOption('db') ? $this->app['dbs'][$input->getOption('db')] : $this->app['db'];
+        $this->path = $input->getOption('path')?: $this->app['migrations.path'];
+
         $repository = new MigrationRepository($this->db);
         $options = [
             'path' => $this->path,
