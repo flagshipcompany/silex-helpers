@@ -10,6 +10,10 @@ class MigrationRepository
     {
         $this->db = $db;
         $this->table = 'migrations';
+
+        if (!$this->exist()) {
+            $this->createMigrationTable();
+        }
     }
 
     /**

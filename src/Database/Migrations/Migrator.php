@@ -16,13 +16,9 @@ class Migrator
         $this->options = $options;
         $this->app = $options['app'];
 
-        $this->repository = new MigrationRepository($this->resolveRepository());
+        $this->repository = new MigrationRepository($this->resolveRepository($this->options['db']));
 
         $this->output = $output;
-
-        if (!$this->repository->exist()) {
-            $this->repository->createMigrationTable();
-        }
     }
 
     public function run()
@@ -177,7 +173,7 @@ class Migrator
         $repository = $this->repository;
 
         if ($instance->db != 'default') {
-            $repository = new MigrationRepository($this->app['dbs'][$instance->db]);
+            $repository = new MigrationRepository($this->resolveRepository($instance->db));
         }
 
         $repository->migrate($instance->down());
@@ -205,7 +201,7 @@ class Migrator
         $repository = $this->repository;
 
         if ($migration->db != 'default') {
-            $repository = new MigrationRepository($this->app['dbs'][$migration->db]);
+            $repository = new MigrationRepository($this->resolveRepository($migration->db));
         }
 
         $repository->migrate($migration->up());
@@ -233,12 +229,12 @@ class Migrator
      *
      * @param  null
      */
-    protected function resolveRepository()
+    protected function resolveRepository($db)
     {
-        if ($this->options['db'] == 'default') {
+        if ($db == 'default') {
             return $this->app['db'];
         }
 
-        return $this->app['dbs'][$this->options['db']];
+        return $this->app['dbs'][$db];
     }
 }
