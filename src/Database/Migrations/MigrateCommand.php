@@ -45,12 +45,6 @@ class MigrateCommand extends Command
                InputOption::VALUE_OPTIONAL,
                'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
             )
-            ->addOption(
-               'env',
-               null,
-               InputOption::VALUE_OPTIONAL,
-               'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
-            )
         ;
     }
 
