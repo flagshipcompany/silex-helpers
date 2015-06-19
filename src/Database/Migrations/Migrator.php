@@ -12,7 +12,7 @@ class Migrator
     protected $migrations;
     protected $output;
 
-    public function __construct(MigrationRepository $repository, $options = [], $output)
+    public function __construct(array $options = [], $output)
     {
         $this->options = $options;
         $this->app = $options['app'];
