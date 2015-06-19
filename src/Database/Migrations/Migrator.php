@@ -216,8 +216,8 @@ class Migrator
 
         $repository = $this->repository;
 
-        if ($instance->db != 'default') {
-            $repository = new MigrationRepository($this->app['dbs'][$instance->db]);
+        if ($migration->db != 'default') {
+            $repository = new MigrationRepository($this->app['dbs'][$migration->db]);
         }
 
         $repository->migrate($migration->up());
