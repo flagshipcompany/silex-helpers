@@ -1,5 +1,5 @@
 <?php
-namespace Flagship\Components\Helpers\Database\Commands\Migrations;
+namespace Flagship\Components\Helpers\Database\Migrations;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

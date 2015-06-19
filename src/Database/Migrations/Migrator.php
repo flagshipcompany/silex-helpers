@@ -1,7 +1,7 @@
 <?php
 
 namespace Flagship\Components\Helpers\Database\Migrations;
-use Flagship\Components\Helpers\Database\Repositories\MigrationRepository;
+use Flagship\Components\Helpers\Database\Migrations\MigrationRepository;
 
 class Migrator
 {

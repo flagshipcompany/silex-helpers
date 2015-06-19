@@ -1,5 +1,5 @@
 <?php
-namespace Flagship\Components\Helpers\Database\Commands\Migrations;
+namespace Flagship\Components\Helpers\DatabaseMigrations;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Flagship\Components\Helpers\Database\Migrations\Migrator;
-use Flagship\Components\Helpers\Database\Repositories\MigrationRepository;
+use Flagship\Components\Helpers\Database\Migrations\MigrationRepository;
 
 
 class MigrateCommand extends Command

@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagship\Components\Helpers\Database\Repositories;
+namespace Flagship\Components\Helpers\Database\Migrations;
 use Doctrine\DBAL\Connection as Database;
 
 class MigrationRepository
