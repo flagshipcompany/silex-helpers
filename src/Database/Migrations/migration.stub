@@ -2,6 +2,8 @@
 
 class {{class}} {
 
+	protected $db = '{{db}}';
+
 	/**
 	 * Run the migrations.
 	 *

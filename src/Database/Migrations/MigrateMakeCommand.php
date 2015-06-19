@@ -12,6 +12,7 @@ class MigrateMakeCommand extends Command
 {
     protected $app;
     protected $path;
+    protected $db;
 
     public function __construct($app)
     {
@@ -36,16 +37,24 @@ class MigrateMakeCommand extends Command
                InputOption::VALUE_OPTIONAL,
                'If not set, the migrations files path will use application default. $app[\'migrations.path\']'
             )
+            ->addOption(
+               'db',
+               null,
+               InputOption::VALUE_OPTIONAL,
+               'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->path = $input->getOption('path')?: $this->app['migrations.path'];
+        $this->db = $input->getOption('db') ? $input->getOption('db') : 'default';
         $migration = $input->getArgument('migration');
 
         $options = [
             'path' => $this->path,
+            'db' => $this->db
         ];
 
         $creator = new MigrationCreator(

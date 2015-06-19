@@ -21,6 +21,8 @@ class MigrationCreator
         }, $arr);
 
         $this->class = implode('', $arr);
+        $this->db = $options['db'];
+
         $this->file = date('Y_m_d_His_') . $name;
         $this->options = $options;
     }
@@ -63,6 +65,7 @@ class MigrationCreator
     protected function populateStub($stub)
     {
         $stub = str_replace('{{class}}', $this->class, $stub);
+        $stub = str_replace('{{db}}', $this->db, $stub);
 
         return $stub;
     }

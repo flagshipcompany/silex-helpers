@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Flagship\Components\Helpers\Database\Migrations\Migrator;
-use Flagship\Components\Helpers\Database\Migrations\MigrationRepository;
 
 
 class MigrateCommand extends Command
@@ -50,16 +49,13 @@ class MigrateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->db = $input->getOption('db') ? $this->app['dbs'][$input->getOption('db')] : $this->app['db'];
-        $this->path = $input->getOption('path')?: $this->app['migrations.path'];
-
-        $repository = new MigrationRepository($this->db);
         $options = [
-            'path' => $this->path,
+            'path' => $input->getOption('path')?: $this->app['migrations.path'],
+            'db' => $input->getOption('db')?: 'default',
+            'app' => $this->app
         ];
 
         $migrator = new Migrator(
-            $repository, 
             $options,
             $output
         );

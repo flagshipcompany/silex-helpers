@@ -5,6 +5,7 @@ use Flagship\Components\Helpers\Database\Migrations\MigrationRepository;
 
 class Migrator
 {
+    protected $app;
     protected $options;
     protected $repository;
 
@@ -13,9 +14,10 @@ class Migrator
 
     public function __construct(MigrationRepository $repository, $options = [], $output)
     {
-        $this->repository = $repository;
-
         $this->options = $options;
+        $this->app = $options['app'];
+
+        $this->repository = new MigrationRepository($this->resolveRepository());
 
         $this->output = $output;
 
@@ -23,6 +25,8 @@ class Migrator
             $this->repository->createMigrationTable();
         }
     }
+
+
 
     public function run()
     {
@@ -179,13 +183,18 @@ class Migrator
         // First we will get the file name of the migration so we can resolve out an
         // instance of the migration.
         $instance = $this->resolve($migration);
-        
 
-        $this->repository->migrate($instance->down());
+        $repository = $this->repository;
+
+        if ($instance->db != 'default') {
+            $repository = new MigrationRepository($this->app['dbs'][$instance->db]);
+        }        
+
+        $repository->migrate($instance->down());
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
         // by the application then will be able to fire by any later operation.
-        $this->repository->delete($migration);
+        $repository->delete($migration);
 
         $this->note("<info>Rolled back:</info> $migration");
 
@@ -205,12 +214,18 @@ class Migrator
         // command such as "up" or "down", or we can just simulate the action.
         $migration = $this->resolve($file);
 
-        $this->repository->migrate($migration->up());
+        $repository = $this->repository;
+
+        if ($instance->db != 'default') {
+            $repository = new MigrationRepository($this->app['dbs'][$instance->db]);
+        }
+
+        $repository->migrate($migration->up());
 
         // Once we have run a migrations class, we will log that it was run in this
         // repository so that we don't try to run it next time we do a migration
         // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($file, $batch);
+        $repository->log($file, $batch);
 
         $this->note("<info>Migrated:</info> $file");
     }
@@ -224,6 +239,20 @@ class Migrator
     protected function note($message)
     {
         $this->output->writeln($message);
+    }
+
+    /**
+     * choose Repository
+     *
+     * @param  null
+     * @return void
+     */
+    protected function resolveReopsitory() {
+        if ($this->options['db'] == 'default') {
+            return $this->app['db'];
+        }
+
+        return $this->app['dbs'][$this->options['db']];
     }
 
 
