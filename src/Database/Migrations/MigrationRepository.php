@@ -1,6 +1,7 @@
 <?php
 
 namespace Flagship\Components\Helpers\Database\Migrations;
+
 use Doctrine\DBAL\Connection as Database;
 
 class MigrationRepository
@@ -16,7 +17,7 @@ class MigrationRepository
      *
      * @return array
      */
-    public function getRan() 
+    public function getRan()
     {
         $q = $this->db->createQueryBuilder();
 
@@ -39,7 +40,7 @@ class MigrationRepository
         $result = $q
             ->select('count(table_name) as c')
             ->from('information_schema.tables')
-            ->where('table_schema = \'' . $params['dbname'] . '\' AND table_name = \'migrations\'')
+            ->where('table_schema = \''.$params['dbname'].'\' AND table_name = \'migrations\'')
             ->execute()->fetch();
 
         return ($result['c'] > 0);
@@ -72,13 +73,12 @@ class MigrationRepository
     /**
      * Log that a migration was run.
      *
-     * @param  string  $file
-     * @param  int     $batch
-     * @return void
+     * @param string $file
+     * @param int    $batch
      */
     public function log($file, $batch)
     {
-        $record = ['migration' => '\'' . $file . '\'', 'batch' => $batch];
+        $record = ['migration' => '\''.$file.'\'', 'batch' => $batch];
 
         $q = $this->db->createQueryBuilder();
 
@@ -102,8 +102,7 @@ class MigrationRepository
     /**
      * Remove a migration from the log.
      *
-     * @param  object  $migration
-     * @return void
+     * @param object $migration
      */
     public function delete($migration)
     {
@@ -115,8 +114,7 @@ class MigrationRepository
     /**
      * Apply a migration SQL query.
      *
-     * @param  string  $migration
-     * @return void
+     * @param string $migration
      */
     public function migrate($migration)
     {
@@ -133,6 +131,4 @@ CREATE TABLE `migrations` (
 SQL;
         $this->migrate($sql);
     }
-
-
 }

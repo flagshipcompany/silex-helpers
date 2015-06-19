@@ -1,4 +1,5 @@
 <?php
+
 namespace Flagship\Components\Helpers\Database\Migrations;
 
 class MigrationCreator
@@ -10,20 +11,19 @@ class MigrationCreator
     /**
      * Create a new migration creator instance.
      *
-     * @param  string  $name
-     * @return void
+     * @param string $name
      */
     public function __construct($name, $options)
     {
         $arr = explode('_', $name);
-        $arr = array_map(function($item){
-            return ucfirst($item); 
+        $arr = array_map(function ($item) {
+            return ucfirst($item);
         }, $arr);
 
         $this->class = implode('', $arr);
         $this->db = $options['db'];
 
-        $this->file = date('Y_m_d_His_') . $name;
+        $this->file = date('Y_m_d_His_').$name;
         $this->options = $options;
     }
 
@@ -34,7 +34,7 @@ class MigrationCreator
      */
     public function create()
     {
-        $fullPath = $this->options['path'] . '/' . $this->file .  '.php';
+        $fullPath = $this->options['path'].'/'.$this->file.'.php';
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
@@ -59,7 +59,8 @@ class MigrationCreator
     /**
      * Populate the place-holders in the migration stub.
      *
-     * @param  string  $stub
+     * @param string $stub
+     *
      * @return string
      */
     protected function populateStub($stub)

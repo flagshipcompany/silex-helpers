@@ -1,7 +1,6 @@
 <?php
 
 namespace Flagship\Components\Helpers\Database\Migrations;
-use Flagship\Components\Helpers\Database\Migrations\MigrationRepository;
 
 class Migrator
 {
@@ -12,7 +11,7 @@ class Migrator
     protected $migrations;
     protected $output;
 
-    public function __construct(array $options = [], $output)
+    public function __construct(array $options, $output)
     {
         $this->options = $options;
         $this->app = $options['app'];
@@ -21,12 +20,10 @@ class Migrator
 
         $this->output = $output;
 
-        if (! $this->repository->exist()) {
+        if (!$this->repository->exist()) {
             $this->repository->createMigrationTable();
         }
     }
-
-
 
     public function run()
     {
@@ -36,13 +33,12 @@ class Migrator
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
         $ran = $this->repository->getRan();
-        
+
         $this->migrations = array_diff($files, $ran);
 
         $this->requireFiles($this->options['path']);
 
         $this->runMigrationList();
-
     }
 
     /**
@@ -52,14 +48,13 @@ class Migrator
      */
     public function getMigrationFiles()
     {
-        $files = glob($this->options['path'] . '/*_*.php');
+        $files = glob($this->options['path'].'/*_*.php');
 
         if (!$files) {
             return [];
         }
 
-        $files = array_map(function($file)
-        {
+        $files = array_map(function ($file) {
             return str_replace('.php', '', basename($file));
         }, $files);
 
@@ -71,31 +66,29 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param  string  $path
-     * @return void
+     * @param string $path
      */
     public function requireFiles($path)
     {
         foreach ($this->migrations as $file) {
-            require_once($path.'/'.$file.'.php');
+            require_once $path.'/'.$file.'.php';
         }
     }
 
     /**
      * Run an array of migrations.
      *
-     * @param  array  $migrations
-     * @param  bool   $pretend
-     * @return void
+     * @param array $migrations
+     * @param bool  $pretend
      */
     public function runMigrationList()
     {
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
-        if (count($this->migrations) == 0)
-        {
+        if (count($this->migrations) == 0) {
             $this->note('<info>Nothing to migrate.</info>');
+
             return;
         }
 
@@ -104,8 +97,7 @@ class Migrator
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
-        foreach ($this->migrations as $file)
-        {
+        foreach ($this->migrations as $file) {
             $this->runUp($file, $batch);
         }
     }
@@ -124,8 +116,7 @@ class Migrator
         // of them "down" to reverse the last migration "operation" which ran.
         $this->migrations = $this->repository->getLast();
 
-        if (count($this->migrations) == 0)
-        {
+        if (count($this->migrations) == 0) {
             $this->note('<info>Nothing to rollback.</info>');
 
             return count($this->migrations);
@@ -136,8 +127,7 @@ class Migrator
         // We need to reverse these migrations so that they are "downed" in reverse
         // to what they run on "up". It lets us backtrack through the migrations
         // and properly reverse the entire database schema operation that ran.
-        foreach ($this->migrations as $migration)
-        {
+        foreach ($this->migrations as $migration) {
             $this->runDown($migration);
         }
 
@@ -147,19 +137,20 @@ class Migrator
     /**
      * Resolve a migration instance from a file.
      *
-     * @param  string  $file
+     * @param string $file
+     *
      * @return object
      */
     public function resolve($file)
     {
         $arr = array_slice(explode('_', $file), 4);
-        $arr = array_map(function($item){
-            return ucfirst($item); 
+        $arr = array_map(function ($item) {
+            return ucfirst($item);
         }, $arr);
 
         $class = implode('', $arr);
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -175,8 +166,7 @@ class Migrator
     /**
      * Run "down" a migration instance.
      *
-     * @param  object  $migration
-     * @return void
+     * @param object $migration
      */
     protected function runDown($migration)
     {
@@ -188,7 +178,7 @@ class Migrator
 
         if ($instance->db != 'default') {
             $repository = new MigrationRepository($this->app['dbs'][$instance->db]);
-        }        
+        }
 
         $repository->migrate($instance->down());
         // Once we have successfully run the migration "down" we will remove it from
@@ -197,15 +187,13 @@ class Migrator
         $repository->delete($migration);
 
         $this->note("<info>Rolled back:</info> $migration");
-
     }
 
     /**
      * Run "up" a migration instance.
      *
-     * @param  string  $file
-     * @param  int     $batch
-     * @return void
+     * @param string $file
+     * @param int    $batch
      */
     protected function runUp($file, $batch)
     {
@@ -233,8 +221,7 @@ class Migrator
     /**
      * Raise a note event for the migrator.
      *
-     * @param  string  $message
-     * @return void
+     * @param string $message
      */
     protected function note($message)
     {
@@ -242,20 +229,16 @@ class Migrator
     }
 
     /**
-     * choose Repository
+     * choose Repository.
      *
      * @param  null
-     * @return void
      */
-    protected function resolveRepository() {
+    protected function resolveRepository()
+    {
         if ($this->options['db'] == 'default') {
             return $this->app['db'];
         }
 
         return $this->app['dbs'][$this->options['db']];
     }
-
-
-
-
 }

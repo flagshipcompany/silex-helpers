@@ -1,4 +1,5 @@
 <?php
+
 namespace Flagship\Components\Helpers\Database\Migrations;
 
 use Symfony\Component\Console\Command\Command;
@@ -6,8 +7,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Flagship\Components\Helpers\Database\Migrations\Migrator;
-
 
 class MigrateCommand extends Command
 {
@@ -50,9 +49,9 @@ class MigrateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options = [
-            'path' => $input->getOption('path')?: $this->app['migrations.path'],
-            'db' => $input->getOption('db')?: 'default',
-            'app' => $this->app
+            'path' => $input->getOption('path') ?: $this->app['migrations.path'],
+            'db' => $input->getOption('db') ?: 'default',
+            'app' => $this->app,
         ];
 
         $migrator = new Migrator(
@@ -60,7 +59,7 @@ class MigrateCommand extends Command
             $output
         );
 
-        $mode = $input->getArgument('mode')?: 'up';
+        $mode = $input->getArgument('mode') ?: 'up';
 
         if ($mode == 'up') {
             $migrator->run();
@@ -69,13 +68,3 @@ class MigrateCommand extends Command
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
