@@ -247,7 +247,7 @@ class Migrator
      * @param  null
      * @return void
      */
-    protected function resolveReopsitory() {
+    protected function resolveRepository() {
         if ($this->options['db'] == 'default') {
             return $this->app['db'];
         }
