@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagship\Components\Helpers\ApiRequests;
+namespace Flagship\Components\Helpers\Requests;
 
 class ApiRequest
 {
@@ -21,21 +21,27 @@ class ApiRequest
         return $this->doRequest($uri, [], 'GET', $isAdmin);
     }
 
-    public function post($uri, $data, $isAdmin = false, $isJson = true)
+    public function post($uri, $data, $isAdmin = false)
     {
-        return $this->doRequest($uri, $data, 'POST', $isAdmin, $isJson);
+        return $this->doRequest($uri, $data, 'POST', $isAdmin);
     }
 
-    public function delete($uri, $data, $isAdmin = false, $isJson = false)
+    public function delete($uri, $data, $isAdmin = false)
     {
-        return $this->doRequest($uri, $data, 'DELETE', $isAdmin, $isJson);
+        return $this->doRequest($uri, $data, 'DELETE', $isAdmin);
     }
 
-    protected function doRequest($uri, $data, $method, $isAdmin = false, $isJson = false)
+    protected function doRequest($uri, $data, $method, $isAdmin = false)
     {
-        $headers = $isAdmin
-            ? $this->app['auth.apiheaders_service']->generateAdminHeaders(false, $isJson)
-            : $this->app['auth.apiheaders_service']->generateHeaders(false, $isJson);
+        $isJson = is_string($data) && json_decode($data) !== null;
+
+        if ($isAdmin) {
+            $headers = $this->app['auth.apiheaders_service']->generateAdminHeaders($isJson);
+        }
+
+        if (!$isAdmin) {
+            $headers = $this->app['auth.apiheaders_service']->generateHeaders($isJson);
+        }
 
         $location = $this->apiUrl.$uri;
 
