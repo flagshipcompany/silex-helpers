@@ -14,16 +14,16 @@ class ApiRequest
         $this->apiUrl = $app['api.url'];
     }
 
-    public function get($uri, $data, $isAdmin = false)
+    public function get($uri, $data, $isAdmin = false, $companyId = null)
     {
         $uri .= '?'.$this->createQuery($data);
 
-        return $this->doRequest($uri, [], 'GET', $isAdmin);
+        return $this->doRequest($uri, [], 'GET', $isAdmin, $companyId);
     }
 
-    public function post($uri, $data, $isAdmin = false)
+    public function post($uri, $data, $isAdmin = false, $companyId = null)
     {
-        return $this->doRequest($uri, $data, 'POST', $isAdmin);
+        return $this->doRequest($uri, $data, 'POST', $isAdmin, $companyId);
     }
 
     public function delete($uri, $data, $isAdmin = false)
@@ -31,12 +31,12 @@ class ApiRequest
         return $this->doRequest($uri, $data, 'DELETE', $isAdmin);
     }
 
-    protected function doRequest($uri, $data, $method, $isAdmin = false)
+    protected function doRequest($uri, $data, $method, $isAdmin = false, $companyId = null)
     {
         $isJson = is_string($data) && json_decode($data) !== null;
 
         if ($isAdmin) {
-            $headers = $this->app['auth.apiheaders_service']->generateAdminHeaders($isJson);
+            $headers = $this->app['auth.apiheaders_service']->generateAdminHeaders($isJson, $companyId);
         }
 
         if (!$isAdmin) {
