@@ -7,6 +7,7 @@ class ApiRequest
     protected $app;
     protected $apiUrl;
     protected $uri;
+    protected $latestHttpCode;
 
     public function __construct($app)
     {
@@ -31,6 +32,11 @@ class ApiRequest
         return $this->doRequest($uri, $data, 'DELETE', $isAdmin);
     }
 
+    public function getLatestHttpCode()
+    {
+        return $this->latestHttpCode;
+    }
+
     protected function doRequest($uri, $data, $method, $isAdmin = false, $companyId = null)
     {
         $isJson = is_string($data) && json_decode($data) !== null;
@@ -52,6 +58,7 @@ class ApiRequest
         }
 
         $resp = curl_exec($curl);
+        $this->latestHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         curl_close($curl);
 
