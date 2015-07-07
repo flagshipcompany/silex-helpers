@@ -15,10 +15,10 @@ class FormProvider implements ServiceProviderInterface
 
             foreach ($form->getErrors() as $key => $error) {
                 if ($form->isRoot()) {
-                    $errors['#'][] = $error->getMessage();
+                    $errors['#'][] = str_replace('"', '', $error->getMessage());
                 } else {
                     $message = empty($data) ? $error->getMessage() : $data.' '.$error->getMessage();
-                    $errors[] = $message;
+                    $errors[] = str_replace('"', '', $message);
                 }
             }
 
