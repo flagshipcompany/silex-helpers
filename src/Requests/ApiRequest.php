@@ -37,6 +37,11 @@ class ApiRequest
         return $this->latestHttpCode;
     }
 
+    public function isSuccessful()
+    {
+        return $this->latestHttpCode > 199 && $this->latestHttpCode < 300;
+    }
+
     protected function doRequest($uri, $data, $method, $isAdmin = false, $companyId = null)
     {
         $isJson = is_string($data) && json_decode($data) !== null;
