@@ -47,11 +47,11 @@ class ApiRequest
         $isJson = is_string($data) && json_decode($data) !== null;
 
         if ($isAdmin) {
-            $headers = $this->app['auth.apiheaders_service']->generateAdminHeaders($isJson, $companyId);
+            $headers = $this->app['helpers.apiheaders_service']->generateAdminHeaders($isJson, $companyId);
         }
 
         if (!$isAdmin) {
-            $headers = $this->app['auth.apiheaders_service']->generateHeaders($isJson);
+            $headers = $this->app['helpers.apiheaders_service']->generateHeaders($isJson);
         }
 
         $location = $this->apiUrl.$uri;

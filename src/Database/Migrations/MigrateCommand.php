@@ -32,16 +32,22 @@ class MigrateCommand extends Command
                 'migrate up/down'
             )
             ->addOption(
-               'path',
-               null,
-               InputOption::VALUE_OPTIONAL,
-               'If not set, the migrations files path will use application default. If application default is not accessible, the default path will be "./var/migrations"'
+                'path',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'If not set, the migrations files path will use application default. If application default is not accessible, the default path will be "./var/migrations"'
             )
             ->addOption(
-               'db',
-               null,
-               InputOption::VALUE_OPTIONAL,
-               'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
+                'db',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
+            )
+            ->addOption(
+                'env',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'If not set, the migrations files path will use application default. If application default is not accessible, the default can be found in configuration class.'
             )
         ;
     }
