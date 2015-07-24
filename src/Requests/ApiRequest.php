@@ -15,21 +15,21 @@ class ApiRequest
         $this->apiUrl = $app['api.url'];
     }
 
-    public function get($uri, $data, $isAdmin = false, $companyId = null)
+    public function get($uri, $data)
     {
         $uri .= '?'.$this->createQuery($data);
 
-        return $this->doRequest($uri, [], 'GET', $isAdmin, $companyId);
+        return $this->doRequest($uri, [], 'GET');
     }
 
-    public function post($uri, $data, $isAdmin = false, $companyId = null)
+    public function post($uri, $data)
     {
-        return $this->doRequest($uri, $data, 'POST', $isAdmin, $companyId);
+        return $this->doRequest($uri, $data, 'POST');
     }
 
-    public function delete($uri, $data, $isAdmin = false)
+    public function delete($uri, $data)
     {
-        return $this->doRequest($uri, $data, 'DELETE', $isAdmin);
+        return $this->doRequest($uri, $data, 'DELETE');
     }
 
     public function getLatestHttpCode()
@@ -42,17 +42,11 @@ class ApiRequest
         return $this->latestHttpCode > 199 && $this->latestHttpCode < 300;
     }
 
-    protected function doRequest($uri, $data, $method, $isAdmin = false, $companyId = null)
+    protected function doRequest($uri, $data, $method)
     {
         $isJson = is_string($data) && json_decode($data) !== null;
 
-        if ($isAdmin) {
-            $headers = $this->app['helpers.apiheaders_service']->generateAdminHeaders($isJson, $companyId);
-        }
-
-        if (!$isAdmin) {
-            $headers = $this->app['helpers.apiheaders_service']->generateHeaders($isJson);
-        }
+        $headers = $this->app['helpers.apiheaders_service']->getHeaders($isJson);
 
         $location = $this->apiUrl.$uri;
 
