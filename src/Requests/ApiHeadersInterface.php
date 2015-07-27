@@ -4,5 +4,5 @@ namespace Flagship\Components\Helpers\Requests;
 
 interface ApiHeadersInterface
 {
-    public function getHeaders($isJson = true);
+    public function getHeaders();
 }
