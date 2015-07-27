@@ -46,7 +46,11 @@ class ApiRequest
     {
         $isJson = is_string($data) && json_decode($data) !== null;
 
-        $headers = $this->app['helpers.apiheaders_service']->getHeaders($isJson);
+        $headers = $this->app['helpers.apiheaders_service']->getHeaders();
+
+        if ($isJson) {
+            $headers[] = 'Content-Type:application/json';
+        }
 
         $location = $this->apiUrl.$uri;
 
