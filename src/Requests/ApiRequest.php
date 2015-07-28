@@ -63,6 +63,12 @@ class ApiRequest
         $resp = curl_exec($curl);
         $this->latestHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
+        if (curl_getinfo($curl, CURLINFO_CONTENT_TYPE) == 'application/json') {
+            curl_close($curl);
+
+            return json_decode($resp, true);
+        }
+
         curl_close($curl);
 
         return $resp;
