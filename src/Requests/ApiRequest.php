@@ -17,9 +17,9 @@ class ApiRequest
 
     public function get($uri, $data)
     {
-        $uri .= '?'.$this->createQuery($data);
+        $uri .= $this->createQuery($data);
 
-        return $this->doRequest($uri, [], 'GET');
+        return $this->doRequest($uri, null, 'GET');
     }
 
     public function post($uri, $data)
@@ -44,12 +44,11 @@ class ApiRequest
 
     protected function doRequest($uri, $data, $method)
     {
-        $isJson = is_string($data) && json_decode($data) !== null;
-
         $headers = $this->app['helpers.apiheaders_service']->getHeaders();
 
-        if ($isJson) {
+        if (is_array($data)) {
             $headers[] = 'Content-Type:application/json';
+            $data = json_encode($data);
         }
 
         $location = $this->apiUrl.$uri;
@@ -110,6 +109,6 @@ class ApiRequest
             $pieces[] = $name.'='.urlencode($value);
         }
 
-        return implode('&', $pieces);
+        return '?'.implode('&', $pieces);
     }
 }
