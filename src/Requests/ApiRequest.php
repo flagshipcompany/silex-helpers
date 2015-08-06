@@ -17,7 +17,9 @@ class ApiRequest
 
     public function get($uri, $data)
     {
-        $uri .= $this->createQuery($data);
+        if ($data) {
+            $uri .= $this->createQuery($data);
+        }
 
         return $this->doRequest($uri, null, 'GET');
     }
