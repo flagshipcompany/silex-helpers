@@ -113,9 +113,26 @@ class ApiRequest
         });
 
         foreach ($filtered as $name => $value) {
-            $pieces[] = $name.'='.urlencode($value);
+            $pieces = array_merge($pieces, $this->createPiece($name, $value));
         }
 
         return '?'.implode('&', $pieces);
+    }
+
+    protected function createPiece($name, $value)
+    {
+        $piece = [];
+        //if its a single value
+        if (!is_array($value)) {
+            $piece[] = $name.'='.urlencode($value);
+
+            return $piece;
+        }
+        //if there are multiple values (collection)
+        foreach ($value as $k => $v) {
+            $piece[] = $name.'[]='.urlencode($v);
+        }
+
+        return $piece;
     }
 }
