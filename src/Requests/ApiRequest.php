@@ -98,7 +98,7 @@ class ApiRequest
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 2);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 8);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 12);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 
