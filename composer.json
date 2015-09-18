@@ -10,7 +10,8 @@
         "twig/twig": "~1.18",
         "symfony/console": "~2.6",
         "doctrine/dbal": "~2.5",
-        "flagshipcompany/entities": "@dev"
+        "flagshipcompany/entities": "@dev",
+        "aws/aws-sdk-php": "3.*"
     },
     "authors": [{
         "name": "Patrick Leblanc",
