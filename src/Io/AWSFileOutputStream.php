@@ -48,7 +48,7 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
         }
 
         $this->config['Key'] = date('Ym').'/'.basename($filename);
-        $this->config['Body'] = \Guzzle\Http\EntityBody::factory(fopen($filename, 'r'));
+        $this->config['Body'] = \GuzzleHttp\Psr7\stream_for(fopen($filename, 'r'));
         $this->config['Params']['ContentType'] = mime_content_type($filename); // for external
         $this->config['Params']['mimeype'] = $this->config['Params']['ContentType']; // for local
 
