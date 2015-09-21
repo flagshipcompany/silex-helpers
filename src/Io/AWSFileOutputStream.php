@@ -18,6 +18,7 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
         $this->stream = new S3Client([
             'credentials' => $credentials,
             'region' => $region,
+            'version' => 'latest',
         ]);
 
         $this->resetConfig($bucket);
