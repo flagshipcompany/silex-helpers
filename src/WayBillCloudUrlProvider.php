@@ -2,6 +2,7 @@
 
 namespace Flagship\Components\Helpers;
 
+use Flagship\Components\Helpers\Io\AWSFileOutputStream;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
