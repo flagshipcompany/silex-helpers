@@ -6,13 +6,13 @@ use Flagship\Components\Helpers\Io\AWSFileOutputStream;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
-class WayBillCloudUrlProvider implements ServiceProviderInterface
+class AwsS3UrlProvider implements ServiceProviderInterface
 {
     public function register(Container $app)
     {
-        $app['flagship.helpers.cloudUrl'] = $app->protect(function ($filename) use ($app) {
+        $app['flagship.helpers.cloudUrl'] = $app->protect(function ($bucket, $filename) use ($app) {
 
-            $conf = $app['aws.s3']['waybill'];
+            $conf = $app['aws.s3'][$bucket];
 
             return (new AWSFileOutputStream(
                 $conf['credentials'],
