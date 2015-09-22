@@ -17,7 +17,8 @@ class WayBillCloudUrlProvider implements ServiceProviderInterface
             return (new AWSFileOutputStream(
                 $conf['credentials'],
                 $conf['region'],
-                $conf['bucket']
+                $conf['bucket'],
+                $conf['acl']
             ))->getRemoteUrl($filename);
         });
     }

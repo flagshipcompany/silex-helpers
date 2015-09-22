@@ -12,14 +12,17 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
 {
     protected $bucket;
     protected $region;
+    protected $acl;
     protected $key = null; // filename on AWS S3 Storage
     protected $client;
     protected $output;
 
-    public function __construct($credentials, $region, $bucket)
+    // for more possible acl value , check : http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
+    public function __construct($credentials, $region, $bucket, $acl = 'private')
     {
         $this->bucket = $bucket;
         $this->region = $region;
+        $this->acl = $acl;
 
         $this->client = new S3Client([
             'credentials' => $credentials,
@@ -50,14 +53,17 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
 
     public function write($filename, $offset = false, $length = false)
     {
-        $this->key = date('Ym').'/'.basename($filename);
+        $filenameArr = explode('/', $filename);
+
+        $this->key = array_pop($filenameArr);
+        $this->key = date('Ym').'/'.array_pop($filenameArr).'/'.$this->key;
 
         try {
             $this->output = $this->client->putObject([
                 'Bucket' => $this->bucket,
                 'Key' => $this->key,
                 'Body' => \GuzzleHttp\Psr7\stream_for(fopen($filename, 'r+')),
-                'ACL' => 'private',
+                'ACL' => $this->acl,
                 'ServerSideEncryption' => 'AES256',
                 'ContentType' => mime_content_type($filename),
             ]);
@@ -72,6 +78,6 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
     {
         $result = $this->write($filename)->output;
 
-        return $result['ObjectUrl'];
+        return $result['ObjectURL'];
     }
 }
