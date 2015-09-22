@@ -10,18 +10,24 @@ use Flagship\Components\Helpers\Io\Exceptions\IOException;
 
 class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flushable
 {
-    protected $config;
+    protected $bucket;
+    protected $region;
+    protected $key = null; // filename on AWS S3 Storage
+    protected $client;
     protected $output;
 
     public function __construct($credentials, $region, $bucket)
     {
-        $this->stream = new S3Client([
+        $this->bucket = $bucket;
+        $this->region = $region;
+
+        $this->client = new S3Client([
             'credentials' => $credentials,
             'region' => $region,
-            'version' => 'latest',
+            'version' => '2006-03-01',
         ]);
 
-        $this->resetConfig($bucket);
+        // $this->client->registerStreamWrapper();
 
         return $this;
     }
@@ -30,6 +36,7 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
     {
         if (!$this->stream) {
             $this->flush();
+            fclose($this->stream);
             $this->stream = null;
         }
     }
@@ -43,26 +50,17 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
 
     public function write($filename, $offset = false, $length = false)
     {
-        if (!$this->stream) {
-            throw new IOException('Resource access has been closed', 500);
-        }
-
-        $this->config['Key'] = date('Ym').'/'.basename($filename);
-        $this->config['Body'] = \GuzzleHttp\Psr7\stream_for(fopen($filename, 'r'));
-        $this->config['Params']['ContentType'] = mime_content_type($filename); // for external
-        $this->config['Params']['mimeype'] = $this->config['Params']['ContentType']; // for local
+        $this->key = date('Ym').'/'.basename($filename);
 
         try {
-            $this->output = $this->stream->upload(
-                $this->config['Bucket'],
-                $this->config['Key'],
-                $this->config['Body'],
-                $this->config['ACL'],
-                [
-                    'params' => $this->config['Params'],
-                ]
-            );
-            $this->resetConfig($this->config['Bucket']);
+            $this->output = $this->client->putObject([
+                'Bucket' => $this->bucket,
+                'Key' => $this->key,
+                'Body' => \GuzzleHttp\Psr7\stream_for(fopen($filename, 'r+')),
+                'ACL' => 'private',
+                'ServerSideEncryption' => 'AES256',
+                'ContentType' => mime_content_type($filename),
+            ]);
 
             return $this;
         } catch (\Exception $e) {
@@ -70,19 +68,10 @@ class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flus
         }
     }
 
-    public function getOutput()
+    public function getRemoteUrl($filename)
     {
-        return $this->output;
-    }
+        $result = $this->write($filename)->output;
 
-    protected function resetConfig($bucket)
-    {
-        $this->config = [
-            'Bucket' => $bucket,
-            'ACL' => 'private', // or public-read
-            'Params' => [
-                'ServerSideEncryption' => 'AES256',
-            ],
-        ];
+        return $result['ObjectUrl'];
     }
 }
