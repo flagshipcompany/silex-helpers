@@ -34,7 +34,13 @@ class MigrationCreator
      */
     public function create()
     {
-        $fullPath = $this->options['path'].'/'.$this->file.'.php';
+        $dir = $this->options['path'].'/'.$this->db;
+
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755);
+        }
+
+        $fullPath = $dir.'/'.$this->file.'.php';
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
