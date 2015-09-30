@@ -56,7 +56,7 @@ class MigrateCommand extends Command
     {
         $options = [
             'path' => $input->getOption('path') ?: $this->app['migrations.path'],
-            'db' => $input->getOption('db') ?: 'default',
+            'db' => $input->getOption('db') ?: false,
             'app' => $this->app,
         ];
 

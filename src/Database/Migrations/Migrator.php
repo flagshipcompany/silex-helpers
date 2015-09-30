@@ -15,26 +15,28 @@ class Migrator
     {
         $this->options = $options;
         $this->app = $options['app'];
-
-        $this->repository = new MigrationRepository($this->resolveRepository($this->options['db']));
-
         $this->output = $output;
     }
 
     public function run()
     {
-        $files = $this->getMigrationFiles();
+        foreach ($this->getMigrationDBGroups() as $dbGroup) {
+            $this->repository = new MigrationRepository($this->resolveRepository($dbGroup));
 
-        // Once we grab all of the migration files for the path, we will compare them
-        // against the migrations that have already been run for this package then
-        // run each of the outstanding migrations against a database connection.
-        $ran = $this->repository->getRan();
+            $files = $this->getMigrationFiles($dbGroup);
 
-        $this->migrations = array_diff($files, $ran);
+            // Once we grab all of the migration files for the path, we will compare them
+            // against the migrations that have already been run for this package then
+            // run each of the outstanding migrations against a database connection.
+            $ran = $this->repository->getRan();
 
-        $this->requireFiles($this->options['path']);
+            $this->migrations = array_diff($files, $ran);
 
-        $this->runMigrationList();
+            $this->requireFiles($this->options['path'], $dbGroup);
+
+            $this->runMigrationList($dbGroup);
+            $this->migrations = [];
+        }
     }
 
     /**
@@ -42,9 +44,9 @@ class Migrator
      *
      * @return array
      */
-    public function getMigrationFiles()
+    public function getMigrationFiles($dbGroup)
     {
-        $files = glob($this->options['path'].'/*_*.php');
+        $files = glob($this->options['path'].'/'.$dbGroup.'/*_*.php');
 
         if (!$files) {
             return [];
@@ -59,15 +61,35 @@ class Migrator
         return $files;
     }
 
+    public function getMigrationDBGroups()
+    {
+        if ($this->options['db']) {
+            return [$this->options['db']];
+        }
+
+        $directories = glob($this->options['path'].'/*/');
+        $groups = [];
+
+        if (!$directories) {
+            return $groups;
+        }
+
+        foreach ($directories as $dir) {
+            $groups[] = basename($dir);
+        }
+
+        return $groups;
+    }
+
     /**
      * Require in all the migration files in a given path.
      *
      * @param string $path
      */
-    public function requireFiles($path)
+    public function requireFiles($path, $dbGroup)
     {
         foreach ($this->migrations as $file) {
-            require_once $path.'/'.$file.'.php';
+            require_once $path.'/'.$dbGroup.'/'.$file.'.php';
         }
     }
 
@@ -77,8 +99,9 @@ class Migrator
      * @param array $migrations
      * @param bool  $pretend
      */
-    public function runMigrationList()
+    public function runMigrationList($dbGroup)
     {
+        $this->note('<info>DB - '.$dbGroup.':</info>');
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
@@ -107,27 +130,29 @@ class Migrator
     {
         $this->notes = [];
 
-        // We want to pull in the last batch of migrations that ran on the previous
-        // migration operation. We'll then reverse those migrations and run each
-        // of them "down" to reverse the last migration "operation" which ran.
-        $this->migrations = $this->repository->getLast();
+        foreach ($this->getMigrationDBGroups() as $dbGroup) {
+            $this->note('<info>DB - '.$dbGroup.':</info>');
+            $this->repository = new MigrationRepository($this->resolveRepository($dbGroup));
+            // We want to pull in the last batch of migrations that ran on the previous
+            // migration operation. We'll then reverse those migrations and run each
+            // of them "down" to reverse the last migration "operation" which ran.
+            $this->migrations = $this->repository->getLast();
 
-        if (count($this->migrations) == 0) {
-            $this->note('<info>Nothing to rollback.</info>');
+            if (count($this->migrations) == 0) {
+                $this->note('<info>Nothing to rollback.</info>');
 
-            return count($this->migrations);
+                return count($this->migrations);
+            }
+
+            $this->requireFiles($this->options['path'], $dbGroup);
+
+            // We need to reverse these migrations so that they are "downed" in reverse
+            // to what they run on "up". It lets us backtrack through the migrations
+            // and properly reverse the entire database schema operation that ran.
+            foreach ($this->migrations as $migration) {
+                $this->runDown($migration);
+            }
         }
-
-        $this->requireFiles($this->options['path']);
-
-        // We need to reverse these migrations so that they are "downed" in reverse
-        // to what they run on "up". It lets us backtrack through the migrations
-        // and properly reverse the entire database schema operation that ran.
-        foreach ($this->migrations as $migration) {
-            $this->runDown($migration);
-        }
-
-        return count($this->migrations);
     }
 
     /**
@@ -170,17 +195,11 @@ class Migrator
         // instance of the migration.
         $instance = $this->resolve($migration);
 
-        $repository = $this->repository;
-
-        if ($instance->db != 'default') {
-            $repository = new MigrationRepository($this->resolveRepository($instance->db));
-        }
-
-        $repository->migrate($instance->down());
+        $this->repository->migrate($instance->down());
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
         // by the application then will be able to fire by any later operation.
-        $repository->delete($migration);
+        $this->repository->delete($migration);
 
         $this->note("<info>Rolled back:</info> $migration");
     }
