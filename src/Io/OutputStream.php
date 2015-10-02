@@ -3,11 +3,11 @@
 namespace Flagship\Components\Helpers\Io;
 
 use Flagship\Components\Helpers\Io\Abstracts\OutputStreamAbstract;
-use Flagship\Components\Helpers\Io\Interfaces\Closable;
+use Flagship\Components\Helpers\Io\Interfaces\Closeable;
 use Flagship\Components\Helpers\Io\Interfaces\Flushable;
 use Flagship\Components\Helpers\Io\Exceptions\IOException;
 
-class OutputStream extends OutputStreamAbstract implements Closable, Flushable
+class OutputStream extends OutputStreamAbstract implements Closeable, Flushable
 {
     public function __construct()
     {

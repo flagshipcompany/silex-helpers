@@ -2,12 +2,12 @@
 
 namespace Flagship\Components\Helpers\Io\Abstracts;
 
-use Flagship\Components\Helpers\Io\Interfaces\Closable;
+use Flagship\Components\Helpers\Io\Interfaces\Closeable;
 use Flagship\Components\Helpers\Io\Interfaces\Readable;
 use Flagship\Components\Helpers\Io\Exceptions\IOException;
 use Flagship\Components\Helpers\Io\Buffers\CharBuffer;
 
-abstract class ReaderAbstract implements Closable, Readable
+abstract class ReaderAbstract implements Closeable, Readable
 {
     protected $resource;
     protected $position = 0;

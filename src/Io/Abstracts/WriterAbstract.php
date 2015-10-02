@@ -2,12 +2,12 @@
 
 namespace Flagship\Components\Helpers\Io\Abstracts;
 
-use Flagship\Components\Helpers\Io\Interfaces\Closable;
+use Flagship\Components\Helpers\Io\Interfaces\Closeable;
 use Flagship\Components\Helpers\Io\Interfaces\Flushable;
 use Flagship\Components\Helpers\Io\Interfaces\Appendable;
 use Flagship\Components\Helpers\Io\Exceptions\IOException;
 
-abstract class WriterAbstract implements Closable, Flushable, Appendable
+abstract class WriterAbstract implements Closeable, Flushable, Appendable
 {
     protected $resource;
 

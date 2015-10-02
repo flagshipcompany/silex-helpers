@@ -2,10 +2,10 @@
 
 namespace Flagship\Components\Helpers\Io\Abstracts;
 
-use Flagship\Components\Helpers\Io\Interfaces\Closable;
+use Flagship\Components\Helpers\Io\Interfaces\Closeable;
 use Flagship\Components\Helpers\Io\Interfaces\Flushable;
 
-abstract class OutputStreamAbstract implements Closable, Flushable
+abstract class OutputStreamAbstract implements Closeable, Flushable
 {
     protected $stream;
 

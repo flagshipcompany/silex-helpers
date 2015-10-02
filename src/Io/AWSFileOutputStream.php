@@ -4,11 +4,11 @@ namespace Flagship\Components\Helpers\Io;
 
 use Aws\S3\S3Client;
 use Flagship\Components\Helpers\Io\Abstracts\OutputStreamAbstract;
-use Flagship\Components\Helpers\Io\Interfaces\Closable;
+use Flagship\Components\Helpers\Io\Interfaces\Closeable;
 use Flagship\Components\Helpers\Io\Interfaces\Flushable;
 use Flagship\Components\Helpers\Io\Exceptions\IOException;
 
-class AWSFileOutputStream extends OutputStreamAbstract implements Closable, Flushable
+class AWSFileOutputStream extends OutputStreamAbstract implements Closeable, Flushable
 {
     protected $bucket;
     protected $region;
