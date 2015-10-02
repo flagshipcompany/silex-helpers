@@ -91,7 +91,7 @@ abstract class InputStreamAbstract implements Closeable
             $this->skip($offset);
         }
 
-        $data = fread($this->resource, $length);
+        $data = $length ? fread($this->resource, $length) : stream_get_contents($this->resource);
 
         if (!$data) {
             throw new IOException('Failed to read resource '.(new \ReflectionClass($this))->getShortName());
