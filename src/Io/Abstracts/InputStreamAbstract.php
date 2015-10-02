@@ -93,7 +93,7 @@ abstract class InputStreamAbstract implements Closeable
 
         $data = $length ? fread($this->resource, $length) : stream_get_contents($this->resource);
 
-        if (!$data) {
+        if ($data === false) {
             throw new IOException('Failed to read resource '.(new \ReflectionClass($this))->getShortName());
         }
 
