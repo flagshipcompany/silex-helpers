@@ -2,13 +2,13 @@
 
 namespace Flagship\Components\Helpers\Io;
 
-class JsonFileWriter
+class JsonFileWriter extends FileWriter
 {
     protected $writer;
 
     public function __construct($filename)
     {
-        $this->writer = new OutputStreamWriter(new FileOutputStream($filename));
+        parent::__construct($filename);
     }
 
     /**
