@@ -34,6 +34,11 @@ class ApiRequest
         return $this->doRequest($uri, $data, 'DELETE');
     }
 
+    public function patch($uri, $data)
+    {
+        return $this->doRequest($uri, $data, 'PATCH');
+    }
+
     public function getLatestHttpCode()
     {
         return $this->latestHttpCode;
