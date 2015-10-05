@@ -106,6 +106,7 @@ class ApiRequest
         curl_setopt($curl, CURLOPT_TIMEOUT, 12);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 
         return $curl;
     }
