@@ -39,6 +39,11 @@ class ApiRequest
         return $this->doRequest($uri, $data, 'PATCH');
     }
 
+    public function put($uri, $data)
+    {
+        return $this->doRequest($uri, $data, 'PUT');
+    }
+
     public function getLatestHttpCode()
     {
         return $this->latestHttpCode;
