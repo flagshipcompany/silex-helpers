@@ -120,7 +120,7 @@ class ApiRequest
     {
         $pieces = [];
         $filtered = array_filter($data, function ($item) {
-            return !empty($item);
+            return $item !== '' && $item !== null;
         });
 
         foreach ($filtered as $name => $value) {
