@@ -16,6 +16,9 @@ class FormProvider implements ServiceProviderInterface
             foreach ($form->getErrors() as $key => $error) {
                 if ($form->isRoot()) {
                     $errors['#'][] = str_replace('"', '', $error->getMessage());
+                } elseif (strpos($form->getName(), 'password') !== null) {
+                    $message = $error->getMessage();
+                    $errors[] = str_replace('"', '', $message);
                 } else {
                     $message = empty($data) ? $error->getMessage() : $data.' '.$error->getMessage();
                     $errors[] = str_replace('"', '', $message);
