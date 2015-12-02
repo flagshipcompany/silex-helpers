@@ -1,4 +1,5 @@
 <?php
+
 namespace Flagship\Components\Helpers;
 
 use Pimple\Container;
@@ -12,6 +13,7 @@ class TwigProvider implements ServiceProviderInterface
             $this->assetFunction($twig, $app);
             $this->classsetFunction($twig);
             $this->timeagoFilter($twig);
+            $this->trackUrlFilter($twig);
 
             return $twig;
         });
@@ -58,8 +60,8 @@ class TwigProvider implements ServiceProviderInterface
 
                 $numberOfUnits = floor($time / $unit);
 
-                $unitsString = (($numberOfUnits>1) ? $numberOfUnits : 'a');
-                $plural = (($numberOfUnits>1) ? 's' : '');
+                $unitsString = (($numberOfUnits > 1) ? $numberOfUnits : 'a');
+                $plural = (($numberOfUnits > 1) ? 's' : '');
 
                 if (!$isFuture) {
                     return ($val == 'second') ? 'a few seconds ago' : $unitsString.' '.$val.$plural.' ago';
@@ -68,6 +70,38 @@ class TwigProvider implements ServiceProviderInterface
                 return ($val == 'second') ? 'in a few seconds' : 'in '.$unitsString.' '.$val.$plural;
             }
 
+        });
+
+        $twig->addFilter($filter);
+    }
+
+    protected function trackUrlFilter($twig)
+    {
+        $filter = new \Twig_SimpleFilter('trackUrl', function (array $courierAndNbr) {
+
+            $courierId = $courierAndNbr[0];
+            $trackingNumber = $courierAndNbr[1];
+            $trackingUrl = '';
+
+            if (!$trackingNumber) {
+                return $trackingUrl;
+            }
+
+            switch ($courierId) {
+                case 5:
+                    $trackingUrl = 'https://eshiponline.purolator.com/ShipOnline/Public/Track/TrackingDetails.aspx?pup=Y&pin='.$trackingNumber.'&lang=E';
+                    break;
+                case 2:
+                    $trackingUrl = 'http://wwwapps.ups.com/WebTracking/track?HTMLVersion=5.0&loc=en_CA&Requester=UPSHome&trackNums='.$trackingNumber.'&track.x=Track';
+                    break;
+                case 4:
+                    $trackingUrl = 'http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcomreg&track=y&cntry_code=ca_english&language=english&tracknumbers='.$trackingNumber.'&action=1&language=null&cntry_code=ca_english';
+                    break;
+                default:
+                    $trackingUrl = '';
+            }
+
+            return $trackingUrl;
         });
 
         $twig->addFilter($filter);
