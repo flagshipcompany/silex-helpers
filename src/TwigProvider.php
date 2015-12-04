@@ -63,6 +63,10 @@ class TwigProvider implements ServiceProviderInterface
                 $unitsString = (($numberOfUnits > 1) ? $numberOfUnits : 'a');
                 $plural = (($numberOfUnits > 1) ? 's' : '');
 
+                if ($unitsString === 'a' && $val == 'hour') {
+                    $unitsString = 'an';
+                }
+
                 if (!$isFuture) {
                     return ($val == 'second') ? 'a few seconds ago' : $unitsString.' '.$val.$plural.' ago';
                 }
