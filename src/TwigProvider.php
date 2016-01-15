@@ -12,6 +12,7 @@ class TwigProvider implements ServiceProviderInterface
         $app['twig'] = $app->extend('twig', function ($twig, $app) {
             $this->assetFunction($twig, $app);
             $this->classsetFunction($twig);
+            $this->mergeRecursiveFilter($twig);
             $this->timeagoFilter($twig);
             $this->trackUrlFilter($twig);
 
@@ -33,6 +34,14 @@ class TwigProvider implements ServiceProviderInterface
             return implode(' ', array_keys(array_filter($arg)));
         });
         $twig->addFunction($function);
+    }
+
+    protected function mergeRecursiveFilter($twig)
+    {
+        $function = new \Twig_SimpleFilter('merge_recursive', function ($arr1, $arr2) {
+            return array_replace_recursive($arr1, $arr2);
+        });
+        $twig->addFilter($function);
     }
 
     protected function timeagoFilter($twig)
