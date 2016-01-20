@@ -13,7 +13,16 @@ class FormProvider implements ServiceProviderInterface
             $errors = array();
             $data = $form->getData();
 
+            if (!$form->isSubmitted()) {
+                $errors['#'] = 'No request data was supplied, or there was no valid data';
+
+                return $errors;
+            }
+
             foreach ($form->getErrors() as $key => $error) {
+                if (empty($error->getMessage())) {
+                    continue;
+                }
                 if ($form->isRoot()) {
                     $errors['#'][] = str_replace('"', '', $error->getMessage());
                 } elseif (strpos($form->getName(), 'password') !== null) {
