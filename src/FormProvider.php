@@ -25,7 +25,7 @@ class FormProvider implements ServiceProviderInterface
                 }
                 if ($form->isRoot()) {
                     $errors['#'][] = str_replace('"', '', $error->getMessage());
-                } elseif (strpos($form->getName(), 'password') !== null) {
+                } elseif (strpos($form->getName(), 'password') !== false) {
                     $message = $error->getMessage();
                     $errors[] = str_replace('"', '', $message);
                 } else {
