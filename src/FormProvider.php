@@ -29,7 +29,7 @@ class FormProvider implements ServiceProviderInterface
                     $message = $error->getMessage();
                     $errors[] = str_replace('"', '', $message);
                 } else {
-                    $message = empty($data) ? $error->getMessage() : $data.' '.$error->getMessage();
+                    $message = empty($data) || is_array($data) ? $error->getMessage() : $data.' '.$error->getMessage();
                     $errors[] = str_replace('"', '', $message);
                 }
             }
