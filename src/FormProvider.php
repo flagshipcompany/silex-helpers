@@ -35,9 +35,18 @@ class FormProvider implements ServiceProviderInterface
             }
 
             foreach ($form->all() as $child) {
-                if (!$child->isValid()) {
-                    $errors[$child->getName()] = $app['flagship.helpers.forms.getErrorMessages']($child);
+                if ($child->isValid()) {
+                    continue;
                 }
+                $name = $child->getName();
+                if (isset($errors[$name])) {
+                    // If it's not an array, we make it an array so we can append errors to it
+                    $errors[$name] = is_array($errors[$name]) ? $errors[$name] : [$errors[$name]];
+                    $errors[$name][] = $app['flagship.helpers.forms.getErrorMessages']($child);
+
+                    continue;
+                }
+                $errors[$name] = $app['flagship.helpers.forms.getErrorMessages']($child);
             }
 
             return $errors;
