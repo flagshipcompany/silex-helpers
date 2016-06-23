@@ -15,6 +15,7 @@ class TwigProvider implements ServiceProviderInterface
             $this->mergeRecursiveFilter($twig);
             $this->timeagoFilter($twig);
             $this->trackUrlFilter($twig);
+            $this->phoneNbrFilter($twig);
 
             return $twig;
         });
@@ -115,6 +116,45 @@ class TwigProvider implements ServiceProviderInterface
             }
 
             return $trackingUrl;
+        });
+
+        $twig->addFilter($filter);
+    }
+
+    protected function phoneNbrFilter($twig)
+    {
+        $filter = new \Twig_SimpleFilter('phoneNbr', function ($phoneNbr) {
+            preg_match('~[a-z]~i', $phoneNbr, $firstCharacter, PREG_OFFSET_CAPTURE);
+
+            if ($firstCharacter) {
+                $mainLineStr = substr($phoneNbr, 0, $firstCharacter[0][1]);
+                $extStr = substr($phoneNbr, $firstCharacter[0][1] - strlen($phoneNbr));
+                preg_match_all('!\d+!', $mainLineStr, $mainLine);
+                $mainLine = implode('', $mainLine[0]);
+            }
+
+            if (!$firstCharacter) {
+                $extStr = '';
+                preg_match_all('!\d+!', $phoneNbr, $mainLine);
+                $mainLine = implode('', $mainLine[0]);
+            }
+
+            $mainLineLength = strlen($mainLine);
+
+            switch ($mainLineLength) {
+                case 11:
+                    $newMainLineStr = substr($mainLine, 0, 1).'-'.substr($mainLine, 1, 3).'-'.substr($mainLine, 4, 3).'-'.substr($mainLine, 7, 4);
+                    break;
+                case 10:
+                    $newMainLineStr = substr($mainLine, 0, 3).'-'.substr($mainLine, 3, 3).'-'.substr($mainLine, 6, 4);
+                    break;
+
+                default:
+                    $newMainLineStr = $mainLine;
+                    break;
+            }
+
+            return $newMainLineStr.' '.$extStr;
         });
 
         $twig->addFilter($filter);
