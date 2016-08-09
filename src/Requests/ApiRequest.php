@@ -58,9 +58,15 @@ class ApiRequest
     {
         $headers = $this->app['helpers.apiheaders_service']->getHeaders();
 
-        if (is_array($data)) {
+        $hasFiles = $this->hasFiles($data);
+
+        if (is_array($data) && !$hasFiles) {
             $headers[] = 'Content-Type:application/json';
             $data = json_encode($data);
+        }
+
+        if ($hasFiles) {
+            $headers[] = 'Content-Type:multipart/form-data';
         }
 
         $location = $this->apiUrl.$uri;
@@ -145,5 +151,14 @@ class ApiRequest
         }
 
         return $piece;
+    }
+
+    protected function hasFiles(array $data)
+    {
+        $objects = array_filter($data, function ($item) {
+            return is_object($item);
+        });
+
+        return count($objects) > 0;
     }
 }
