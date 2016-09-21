@@ -13,7 +13,10 @@ class TwigProvider implements ServiceProviderInterface
             $this->assetFunction($twig, $app);
             $this->classsetFunction($twig);
             $this->mergeRecursiveFilter($twig);
-            $this->timeagoFilter($twig);
+            //conditionally add the timeago filter if it hasn't already been implemented by another twig extension
+            if (!$twig->hasExtension('timeago')) {
+                $this->timeagoFilter($twig);
+            }
             $this->trackUrlFilter($twig);
             $this->phoneNbrFilter($twig);
 
