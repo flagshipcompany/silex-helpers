@@ -153,8 +153,12 @@ class ApiRequest
         return $piece;
     }
 
-    protected function hasFiles(array $data)
+    protected function hasFiles($data)
     {
+        if (!is_array($data)) {
+            return;
+        }
+
         $objects = array_filter($data, function ($item) {
             return is_object($item);
         });
