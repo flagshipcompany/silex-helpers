@@ -105,6 +105,10 @@ class TwigProvider implements ServiceProviderInterface
             }
 
             switch ($courierId) {
+                case 6:
+                    $trk = explode('|', $trackingNumber);
+                    $trackingUrl = 'https://www.canpar.com/en/track/TrackingAction.do?reference='.current($trk).'&locale=en';
+                    break;
                 case 5:
                     $trackingUrl = 'https://eshiponline.purolator.com/ShipOnline/Public/Track/TrackingDetails.aspx?pup=Y&pin='.$trackingNumber.'&lang=E';
                     break;
