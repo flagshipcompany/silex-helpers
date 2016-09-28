@@ -58,7 +58,7 @@ class ApiRequest
     {
         $headers = $this->app['helpers.apiheaders_service']->getHeaders();
 
-        $hasFiles = $this->hasFiles($data);
+        $hasFiles = $this->hasFiles($data ?? []);
 
         if (is_array($data) && !$hasFiles) {
             $headers[] = 'Content-Type:application/json';
