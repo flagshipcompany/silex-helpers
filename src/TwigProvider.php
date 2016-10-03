@@ -19,6 +19,7 @@ class TwigProvider implements ServiceProviderInterface
             }
             $this->trackUrlFilter($twig);
             $this->phoneNbrFilter($twig);
+            $this->depotDropUrlFilter($twig);
 
             return $twig;
         });
@@ -105,24 +106,57 @@ class TwigProvider implements ServiceProviderInterface
             }
 
             switch ($courierId) {
-                case 6:
-                    $trk = explode('|', $trackingNumber);
-                    $trackingUrl = 'https://www.canpar.com/en/track/TrackingAction.do?reference='.current($trk).'&locale=en';
-                    break;
-                case 5:
-                    $trackingUrl = 'https://eshiponline.purolator.com/ShipOnline/Public/Track/TrackingDetails.aspx?pup=Y&pin='.$trackingNumber.'&lang=E';
-                    break;
                 case 2:
                     $trackingUrl = 'http://wwwapps.ups.com/WebTracking/track?HTMLVersion=5.0&loc=en_CA&Requester=UPSHome&trackNums='.$trackingNumber.'&track.x=Track';
                     break;
                 case 4:
                     $trackingUrl = 'http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcomreg&track=y&cntry_code=ca_english&language=english&tracknumbers='.$trackingNumber.'&action=1&language=null&cntry_code=ca_english';
                     break;
+                case 5:
+                    $trackingUrl = 'https://eshiponline.purolator.com/ShipOnline/Public/Track/TrackingDetails.aspx?pup=Y&pin='.$trackingNumber.'&lang=E';
+                    break;
+                case 6:
+                    $trk = explode('|', $trackingNumber);
+                    $trackingUrl = 'https://www.canpar.com/en/track/TrackingAction.do?reference='.current($trk).'&locale=en';
+                    break;
                 default:
                     $trackingUrl = '';
             }
 
             return $trackingUrl;
+        });
+
+        $twig->addFilter($filter);
+    }
+
+    protected function depotDropUrlFilter($twig)
+    {
+        $filter = new \Twig_SimpleFilter('depotDropUrl', function (int $courierId) {
+
+            $depotDropUrl = '';
+
+            if (!$courierId) {
+                return $depotDropUrl;
+            }
+
+            switch ($courierId) {
+                case 2:
+                    $depotDropUrl = 'https://www.ups.com/dropoff?loc=en_ca';
+                    break;
+                case 4:
+                    $depotDropUrl = 'http://www.fedex.com/locate/index.html?locale=en_CA';
+                    break;
+                case 5:
+                    $depotDropUrl = 'https://www.purolator.com/en/ship-track/find-location.page';
+                    break;
+                case 6:
+                    $depotDropUrl = 'https://www.canpar.ca/en/ship/drop_off.jsp';
+                    break;
+                default:
+                    $depotDropUrl = '';
+            }
+
+            return $depotDropUrl;
         });
 
         $twig->addFilter($filter);
