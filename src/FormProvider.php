@@ -10,7 +10,7 @@ class FormProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         $app['flagship.helpers.forms.getErrorMessages'] = $app->protect(function (\Symfony\Component\Form\Form $form) use ($app) {
-            $errors = array();
+            $errors = [];
             $data = $form->getData();
 
             if (!$form->isSubmitted()) {
@@ -50,6 +50,20 @@ class FormProvider implements ServiceProviderInterface
             }
 
             return $errors;
+        });
+
+        $app['flagship.helpers.forms.errorsArrayToString'] = $app->protect(function (array $errors) use ($app) {
+            $string = '';
+            array_walk($errors, function ($item, $key) use (&$string, $app) {
+                if (is_array($item)) {
+                    $string .= $key.'->'.$app['flagship.helpers.forms.errorsArrayToString']($item);
+
+                    return;
+                }
+                $string .= $item.', ';
+            });
+
+            return $string;
         });
     }
 }
