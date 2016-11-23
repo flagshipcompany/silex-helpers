@@ -20,6 +20,7 @@ class TwigProvider implements ServiceProviderInterface
             $this->trackUrlFilter($twig);
             $this->phoneNbrFilter($twig);
             $this->depotDropUrlFilter($twig);
+            $this->attributeNameFilter($twig, $app);
 
             return $twig;
         });
@@ -196,6 +197,37 @@ class TwigProvider implements ServiceProviderInterface
             }
 
             return $newMainLineStr.' '.$extStr;
+        });
+
+        $twig->addFilter($filter);
+    }
+
+    protected function attributeNameFilter($twig, $app)
+    {
+        $filter = new \Twig_SimpleFilter('attributeName', function ($fullNameOrId, $showDescription = false) use ($app) {
+            $attributeName = '';
+
+            if ($fullNameOrId == strval(intval($fullNameOrId))) {
+                try {
+                    $attribute = $app['smartship.attributes']->getAttributeById($fullNameOrId);
+                } catch (\Exception $e) {
+                    throw new \Exception('Attribute id `'.$fullNameOrId.'` was not found.');
+                }
+            }
+
+            if (is_string($fullNameOrId)) {
+                try {
+                    $attribute = $app['smartship.attributes']->getAttributeByName($fullNameOrId);
+                } catch (\Exception $e) {
+                    throw new \Exception('Attribute name `'.$fullNameOrId.'` was not found.');
+                }
+            }
+
+            if (!empty($attribute)) {
+                $attributeName = !$showDescription ? strtolower(implode(' ', preg_split('/(?=[A-Z])/', $attribute['name']))) : $attribute['description'];
+            }
+
+            return $attributeName;
         });
 
         $twig->addFilter($filter);
