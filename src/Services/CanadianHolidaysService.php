@@ -40,6 +40,12 @@ class CanadianHolidaysService
                 'except' => [],
                 'name' => "Louis Riel Day",
             ],
+            [
+                'str' => 'third Monday of February',
+                'applies' => ['NS'],
+                'except' => [],
+                'name' => "Heritage Day",
+            ],
         ],
         3 => [
             [
