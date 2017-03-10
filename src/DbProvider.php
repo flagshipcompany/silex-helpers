@@ -22,11 +22,10 @@ class DbProvider implements ServiceProviderInterface
                 if (count($v) === 1) {
                     $v = $v[0];
                 }
-
             });
 
             array_walk_recursive($z, function (&$v, $k) {
-                $v = is_numeric($v) ? $v+0 : $v;
+                $v = is_numeric($v) ? $v + 0 : $v;
             });
 
             return count($z) > 0 ? $z : false;
@@ -59,7 +58,7 @@ class DbProvider implements ServiceProviderInterface
 
             foreach ($allKeys as $item) {
                 $element = substr($item, 0, strpos($item, '_'));
-                $keyMap[$element][$item] = substr($item, strpos($item, '_')+1);
+                $keyMap[$element][$item] = substr($item, strpos($item, '_') + 1);
             }
 
             if (empty($entityPrefix)) {
@@ -80,7 +79,7 @@ class DbProvider implements ServiceProviderInterface
             $i = 0;
 
             foreach ($rows as $r) {
-                $i++;
+                ++$i;
                 $uniquer = $r[$unique];
                 if (!isset($entities[$uniquer])) {
                     $entities[$uniquer] = $this->createItem($entityKeys, $r);
@@ -99,9 +98,7 @@ class DbProvider implements ServiceProviderInterface
             foreach ($entities as $key => &$value) {
                 foreach ($value as $subkey => &$subvalue) {
                     if (is_array($subvalue)) {
-                        // if the subvalue key is empty(or false) make subvalue empty
-                        // this is an issue when a shipment has no accountables
-                        $subvalue = key($subvalue) == false ? [] : array_values($subvalue);
+                        $subvalue = $this->handleNullKeys($subvalue);
                     }
                 }
             }
@@ -118,5 +115,31 @@ class DbProvider implements ServiceProviderInterface
         }
 
         return $item;
+    }
+
+    /**
+     * If all the subvalue keys is empty(or false) make subvalue an empty array;
+     * else, use only the keys that are not empty.
+     *
+     * For example, this prevents issues when a shipment has no accountables
+     *
+     * @param mixed $subvalue
+     *
+     * @return mixed
+     */
+    protected function handleNullKeys($subvalue)
+    {
+        if (!is_array($subvalue)) {
+            return $subvalue;
+        }
+        // find non-null keys
+        $validKeys = array_filter(array_keys($subvalue));
+
+        $result = [];
+        array_walk($validKeys, function ($vk, $k, $subvalue) use (&$result) {
+            $result[$vk] = $subvalue[$vk];
+        }, $subvalue);
+
+        return $result;
     }
 }
