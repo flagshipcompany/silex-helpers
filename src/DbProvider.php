@@ -121,7 +121,7 @@ class DbProvider implements ServiceProviderInterface
      * If all the subvalue keys is empty(or false) make subvalue an empty array;
      * else, use only the keys that are not empty.
      *
-     * For example, this prevents issues when a shipment has no accountables
+     * For example, this prevents issues when a main entity has no sub entities
      *
      * @param mixed $subvalue
      *
