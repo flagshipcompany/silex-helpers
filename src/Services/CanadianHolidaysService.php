@@ -188,6 +188,14 @@ class CanadianHolidaysService
             $target += self::SECONDS_PER_DAY;
         }
 
+        // Re-iterate through the weekends and holidays functions
+        // Applies for when current date is the day before a holiday and 
+        // holidays squash a weekend, such as easter (holiday on Friday and Monday, date Thursday)
+        $target = self::avoidWeekend($target);
+        while (in_array(date('Y-m-d', $target), $holidays)) {
+            $target += self::SECONDS_PER_DAY;
+        }
+
         return date('Y-m-d', $target);
     }
 
@@ -211,23 +219,14 @@ class CanadianHolidaysService
         $monthHolidays = self::$sh[$month];
         $easter = easter_date((int) date('Y', $time));
 
+        //we only add good friday as a holiday, since the couriers consider easter monday a business day
         $goodFriday = $easter - (2 * self::SECONDS_PER_DAY);
         if (((int) date('n', $goodFriday)) === $month) {
             $monthHolidays[] = [
                 'str' => date('Y-m-d', $goodFriday),
                 'applies' => ['nationwide'],
-                'except' => ['QC'],
-                'name' => 'Good Friday',
-            ];
-        }
-
-        $easterMonday = $easter + self::SECONDS_PER_DAY;
-        if (((int) date('n', $easterMonday)) === $month) {
-            $monthHolidays[] = [
-                'str' => date('Y-m-d', $easterMonday),
-                'applies' => ['QC'],
                 'except' => [],
-                'name' => 'Easter Monday',
+                'name' => 'Good Friday',
             ];
         }
 
