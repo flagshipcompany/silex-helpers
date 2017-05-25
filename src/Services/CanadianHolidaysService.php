@@ -172,17 +172,19 @@ class CanadianHolidaysService
         return !in_array(date('Y-m-d', $target), $holidays);
     }
 
-    public static function getBusinessDayFor(string $date, int $daysToAdd, string $province = '') : string
+    public static function getBusinessDayFor(string $date, int $businessDaysToAdd, string $province = '') : string
     {
         $target = strtotime($date);
         $count = 0;
-        
+
+        //Avoids weekends during each itteration, so that we don't consider weekends to be business days and not increment the count for them
         do {
             $target += self::SECONDS_PER_DAY;
+            $target = self::avoidWeekend($target);
             ++$count;
             
-        } while ($count < $daysToAdd);
-        $target = date('Y-m-d', self::avoidWeekend($target));
+        } while ($count < $businessDaysToAdd);
+        $target = date('Y-m-d', $target);
 
         if (!empty($province) && self::isBusinessDay($province, $target) === false) {
             $target = self:: getNextBusinessDayAfter($province, $target);
