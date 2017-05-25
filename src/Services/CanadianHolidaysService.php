@@ -172,6 +172,25 @@ class CanadianHolidaysService
         return !in_array(date('Y-m-d', $target), $holidays);
     }
 
+    public static function getBusinessDayFor(string $date, int $daysToAdd, string $province = '') : string
+    {
+        $target = strtotime($date);
+        $count = 0;
+        
+        do {
+            $target += self::SECONDS_PER_DAY;
+            ++$count;
+            
+        } while ($count < $daysToAdd);
+        $target = date('Y-m-d', self::avoidWeekend($target));
+
+        if (!empty($province) && self::isBusinessDay($province, $target) === false) {
+            $target = self:: getNextBusinessDayAfter($province, $target);
+        }
+
+        return $target;
+    }
+
     public static function getNextBusinessDayAfter(string $province, string $date) : string
     {
         $target = strtotime($date);

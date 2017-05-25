@@ -86,14 +86,17 @@ class ApiRequest
 
             return json_decode($resp, true);
         }
-        
-        curl_close($curl);
-        
-        if ($resp === false) {
-            return ['errors' => [sprintf('Looks like the server is unreacheable or is timing out. Response code: %d', $this->latestHttpCode)]];
-        }
 
-        return $resp;
+        if ($resp === false) {
+            curl_close($curl);
+
+            return ['errors' => 'Looks like the server is unreacheable or is timing out'];
+        }
+        $errorStr = 'Invalid API response. Expected application/json, received '.curl_getinfo($curl, CURLINFO_CONTENT_TYPE);
+
+        curl_close($curl);
+
+        return ['errors' => $errorStr];
     }
 
     protected function createCurlHandler($location, $headers, $method)
