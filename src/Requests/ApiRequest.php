@@ -87,6 +87,12 @@ class ApiRequest
             return json_decode($resp, true);
         }
 
+        if (empty($resp) && $this->isSuccessful()) {
+            curl_close($curl);
+
+            return $resp;
+        }
+
         if ($resp === false) {
             curl_close($curl);
 
