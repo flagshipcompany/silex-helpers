@@ -2,8 +2,9 @@
     "name": "flagshipcompany/silex-helpers",
     "version": "0.0.1",
     "type": "library",
-    "requires": {
-        "php": ">=5.3.3"
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/dotenv": "^3.3"
     },
     "require-dev": {
         "pimple/pimple": "~3.0",
@@ -27,5 +28,5 @@
             "type": "vcs",
             "url":  "git@github.com:flagshipcompany/entities.git"
         }
-    ]    
+    ]
 }
