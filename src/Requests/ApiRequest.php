@@ -15,33 +15,33 @@ class ApiRequest
         $this->apiUrl = $app['api.url'];
     }
 
-    public function get($uri, $data)
+    public function get($uri, $data, array $curlOptions = [])
     {
         if ($data) {
             $uri .= $this->createQuery($data);
         }
 
-        return $this->doRequest($uri, null, 'GET');
+        return $this->doRequest($uri, null, 'GET', $curlOptions);
     }
 
-    public function post($uri, $data)
+    public function post($uri, $data, array $curlOptions = [])
     {
-        return $this->doRequest($uri, $data, 'POST');
+        return $this->doRequest($uri, $data, 'POST', $curlOptions);
     }
 
-    public function delete($uri, $data)
+    public function delete($uri, $data, array $curlOptions = [])
     {
-        return $this->doRequest($uri, $data, 'DELETE');
+        return $this->doRequest($uri, $data, 'DELETE', $curlOptions);
     }
 
-    public function patch($uri, $data)
+    public function patch($uri, $data, array $curlOptions = [])
     {
-        return $this->doRequest($uri, $data, 'PATCH');
+        return $this->doRequest($uri, $data, 'PATCH', $curlOptions);
     }
 
-    public function put($uri, $data)
+    public function put($uri, $data, array $curlOptions = [])
     {
-        return $this->doRequest($uri, $data, 'PUT');
+        return $this->doRequest($uri, $data, 'PUT', $curlOptions);
     }
 
     public function getLatestHttpCode()
@@ -54,7 +54,7 @@ class ApiRequest
         return $this->latestHttpCode > 199 && $this->latestHttpCode < 300;
     }
 
-    protected function doRequest($uri, $data, $method)
+    protected function doRequest($uri, $data, $method, $curlOptions = [])
     {
         $headers = $this->app['helpers.apiheaders_service']->getHeaders();
 
@@ -71,7 +71,7 @@ class ApiRequest
 
         $location = $this->apiUrl.$uri;
 
-        $curl = $this->createCurlHandler($location, $headers, $method);
+        $curl = $this->createCurlHandler($location, $headers, $method, $curlOptions);
 
         if ($method != 'GET') {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
@@ -105,7 +105,7 @@ class ApiRequest
         return ['errors' => $errorStr];
     }
 
-    protected function createCurlHandler($location, $headers, $method)
+    protected function createCurlHandler($location, $headers, $method, $curlOptions = [])
     {
         $curl = curl_init($location);
 
@@ -127,6 +127,10 @@ class ApiRequest
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+
+        if (!empty($curlOptions)) {
+            curl_setopt_array($curl, $curlOptions);
+        }
 
         return $curl;
     }
