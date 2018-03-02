@@ -13,6 +13,7 @@ class TwigProvider implements ServiceProviderInterface
             $this->assetFunction($twig, $app);
             $this->classsetFunction($twig);
             $this->mergeRecursiveFilter($twig);
+            $this->regexMatchFunction($twig);
             //conditionally add the timeago filter if it hasn't already been implemented by another twig extension
             if (!$twig->hasExtension('timeago')) {
                 $this->timeagoFilter($twig);
@@ -38,6 +39,14 @@ class TwigProvider implements ServiceProviderInterface
     {
         $function = new \Twig_SimpleFunction('classset', function ($arg) {
             return implode(' ', array_keys(array_filter($arg)));
+        });
+        $twig->addFunction($function);
+    }
+
+    protected function regexMatchFunction($twig)
+    {
+        $function = new \Twig_SimpleFunction('regex_match', function ($pattern, $subject) {
+            return preg_match($pattern, $subject) === 1;
         });
         $twig->addFunction($function);
     }
