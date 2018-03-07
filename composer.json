@@ -9,9 +9,9 @@
     "require-dev": {
         "pimple/pimple": "~3.0",
         "twig/twig": "~1.18",
-        "symfony/console": "~2.6",
+        "symfony/console": "3.4.*",
         "doctrine/dbal": "~2.5",
-        "flagshipcompany/entities": "@dev",
+        "flagshipcompany/entities": "dev-sf34",
         "aws/aws-sdk-php": "3.*"
     },
     "authors": [{
