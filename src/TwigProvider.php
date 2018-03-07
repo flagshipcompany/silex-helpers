@@ -119,6 +119,9 @@ class TwigProvider implements ServiceProviderInterface
                 case 2:
                     $trackingUrl = 'http://wwwapps.ups.com/WebTracking/track?HTMLVersion=5.0&loc=en_CA&Requester=UPSHome&trackNums='.$trackingNumber.'&track.x=Track';
                     break;
+                case 3:
+                    $trackingUrl = 'http://www.dhl.com/en/express/tracking.html?AWB='.$trackingNumber.'&brand=DHL';
+                    break;
                 case 4:
                     $trackingUrl = 'http://www.fedex.com/Tracking?ascend_header=1&clienttype=dotcomreg&track=y&cntry_code=ca_english&language=english&tracknumbers='.$trackingNumber.'&action=1&language=null&cntry_code=ca_english';
                     break;
