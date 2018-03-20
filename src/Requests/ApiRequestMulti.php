@@ -8,7 +8,7 @@ class ApiRequestMulti extends ApiRequest
     protected $results = [];
     protected $statuses = [];
 
-    public function get($uri, $data)
+    public function get($uri, $data, array $curlOptions = [])
     {
         if ($data) {
             $uri .= $this->createQuery($data);
@@ -17,22 +17,22 @@ class ApiRequestMulti extends ApiRequest
         return $this->addRequest($uri, null, 'GET');
     }
 
-    public function post($uri, $data)
+    public function post($uri, $data, array $curlOptions = [])
     {
         return $this->addRequest($uri, $data, 'POST');
     }
 
-    public function delete($uri, $data)
+    public function delete($uri, $data, array $curlOptions = [])
     {
         return $this->addRequest($uri, $data, 'DELETE');
     }
 
-    public function patch($uri, $data)
+    public function patch($uri, $data, array $curlOptions = [])
     {
         return $this->addRequest($uri, $data, 'PATCH');
     }
 
-    public function put($uri, $data)
+    public function put($uri, $data, array $curlOptions = [])
     {
         return $this->addRequest($uri, $data, 'PUT');
     }
