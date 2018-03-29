@@ -159,6 +159,13 @@ class CanadianHolidaysService
         ],
     ];
 
+    /**
+     * List of month holidays cache
+     *
+     * @var array
+     */
+    public static $monthHolidaysCache = [];
+
     public static function isBusinessDay(string $province, string $date) : bool
     {
         $target = strtotime($date);
@@ -166,72 +173,100 @@ class CanadianHolidaysService
             return false;
         }
 
-        $applicable = self::findApplicableHolidays($province, $target);
-        $holidays = self::formatApplicableHolidays($applicable, $target);
+        $holidays = self::findApplicableHolidays($province, $target);
 
         return !in_array(date('Y-m-d', $target), $holidays);
     }
 
-    public static function getBusinessDayFor(string $date, int $businessDaysToAdd, string $province = '') : string
+    public static function getBusinessDayFor(string $date, int $businessDaysToAdd, string $province = '', bool $useNextMonthToo = null) : string
     {
         $target = strtotime($date);
         $count = 0;
+        $monthBefore = (int) date('n', $target);
+        $nextMonthHolidays = [];
+        if ($useNextMonthToo === true) {
+            $nextMonthHolidays = self::getNexMonthHolidays($date, $province);
+        }
+        $holidays = array_merge(self::findApplicableHolidays($province, $target), $nextMonthHolidays);
 
         //Avoids weekends during each itteration, so that we don't consider weekends to be business days and not increment the count for them
         do {
             $target += self::SECONDS_PER_DAY;
+            $count += in_array(date('Y-m-d', $target), $holidays) ? 0 : 1;
             $target = self::avoidWeekend($target);
-            ++$count;
-            
-        } while ($count < $businessDaysToAdd);
-        $target = date('Y-m-d', $target);
+        } while ($count < $businessDaysToAdd || in_array(date('Y-m-d', $target), $holidays));
 
-        if (!empty($province) && self::isBusinessDay($province, $target) === false) {
-            $target = self:: getNextBusinessDayAfter($province, $target);
+        $result = date('Y-m-d', $target);
+
+        // If after adding the days we are in a different month, we recalculate everything with the holidays of both months
+        // We check if $useNextMonthToo was provided to avoid an infinite loop
+        $monthAfter =  (int) date('n', $target);
+        if ($monthAfter !== $monthBefore && !$useNextMonthToo) {
+            return self::getBusinessDayFor($date, $businessDaysToAdd, $province, true);
         }
 
-        return $target;
+        return $result;
     }
 
-    public static function getNextBusinessDayAfter(string $province, string $date) : string
+    public static function getNextBusinessDayAfter(string $province, string $date, bool $useNextMonthToo = null) : string
     {
         $target = strtotime($date);
+        $monthBefore = (int) date('n', $target);
+        $nextMonthHolidays = [];
+        if ($useNextMonthToo === true) {
+            $nextMonthHolidays = self::getNexMonthHolidays($date, $province);
+        }
+        $holidays = array_merge(self::findApplicableHolidays($province, $target), $nextMonthHolidays);
+
         // Next day
         $target += self::SECONDS_PER_DAY;
-        // Avoid weekends
-        $target = self::avoidWeekend($target);
-        // Find applicable holidays
-        $applicable = self::findApplicableHolidays($province, $target);
-        $holidays = self::formatApplicableHolidays($applicable, $target);
 
         // Avoid holidays
         while (in_array(date('Y-m-d', $target), $holidays)) {
             $target += self::SECONDS_PER_DAY;
         }
-
-        // Re-iterate through the weekends and holidays functions
-        // Applies for when current date is the day before a holiday and 
-        // holidays squash a weekend, such as easter (holiday on Friday and Monday, date Thursday)
+        // Avoid weekends
         $target = self::avoidWeekend($target);
+
+        // Avoid holidays again
         while (in_array(date('Y-m-d', $target), $holidays)) {
             $target += self::SECONDS_PER_DAY;
         }
 
-        return date('Y-m-d', $target);
+        $result = date('Y-m-d', $target);
+
+        // If after adding the days we are in a different month, we recalculate everything with the holidays of both months
+        // We check if $useNextMonthToo was provided to avoid an infinite loop
+        $monthAfter =  (int) date('n', $target);
+        if ($monthAfter !== $monthBefore && !$useNextMonthToo) {
+            return self::getNextBusinessDayAfter($province, $date, true);
+        }
+
+        return $result;
     }
 
     protected static function findApplicableHolidays(string $province, int $time)
     {
-        $monthHolidays = self::findMonthHolidays($time);
+        $month = (int) date('n', $time);
+        $year = (int) date('Y', $time);
 
+        if (isset(self::$monthHolidaysCache[$year.$month.$province])) {
+            return self::$monthHolidaysCache[$year.$month.$province];
+        }
+
+        $monthHolidays = self::findMonthHolidays($time);
         // Find applicable holidays
         $applicable = array_filter($monthHolidays, function ($holiday) use ($province) {
             $applies = reset($holiday['applies']) === 'nationwide' || in_array($province, $holiday['applies']);
 
             return $applies && !in_array($province, $holiday['except']);
         });
+
+        $result = self::formatApplicableHolidays($applicable, $time);
+
+        self::$monthHolidaysCache[$year.$month.$province] = $result;
         
-        return $applicable;
+        return $result;
     }
 
     protected static function findMonthHolidays(int $time)
@@ -275,5 +310,13 @@ class CanadianHolidaysService
         }
 
         return $time;
+    }
+
+    protected static function getNexMonthHolidays($dateString, $province)
+    {
+        $dt = new \DateTime($dateString);
+        $dt->add(new \DateInterval('P1M'));
+
+        return self::findApplicableHolidays($province, ((int) $dt->format('U')));
     }
 }
