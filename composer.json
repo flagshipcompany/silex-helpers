@@ -8,10 +8,10 @@
     },
     "require-dev": {
         "pimple/pimple": "~3.0",
-        "twig/twig": "~1.18",
+        "twig/twig": "~2.0",
         "symfony/console": "3.4.*",
         "doctrine/dbal": "~2.5",
-        "flagshipcompany/entities": "dev-sf34",
+        "flagshipcompany/entities": "@dev",
         "aws/aws-sdk-php": "3.*"
     },
     "authors": [{
